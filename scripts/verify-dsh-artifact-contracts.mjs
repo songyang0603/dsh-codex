@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -39,21 +39,29 @@ if (!existsSync(pnpmStore)) {
   );
 }
 
-const packageDirectoryPrefix = `${packageName.replace("/", "+").replace("@", "@")}@${artifact.version}_`;
-const candidates = readdirSync(pnpmStore)
-  .filter((entry) => entry.startsWith(packageDirectoryPrefix))
-  .map((entry) =>
-    resolve(
-      pnpmStore,
-      entry,
-      "node_modules/@deepseek-ai/dsh-user-approval/lib/types/types.d.ts",
-    ),
-  )
-  .filter(existsSync);
-
-if (candidates.length !== 1) {
+// pnpm shortens virtual-store directory names more aggressively on Windows,
+// so their names are not a portable package lookup API. Resolve the package
+// through pnpm's stable hoisted dependency directory instead.
+const installedPackage = resolve(
+  pnpmStore,
+  "node_modules/@deepseek-ai/dsh-user-approval",
+);
+const installedDeclaration = resolve(installedPackage, "lib/types/types.d.ts");
+if (!existsSync(installedDeclaration)) {
   throw new Error(
-    `expected one installed ${packageName}@${artifact.version} declaration, found ${candidates.length}`,
+    `could not resolve the installed ${packageName}@${artifact.version} declaration`,
+  );
+}
+
+const installedManifest = JSON.parse(
+  readFileSync(resolve(installedPackage, "package.json"), "utf8"),
+);
+if (
+  installedManifest.name !== packageName ||
+  installedManifest.version !== artifact.version
+) {
+  throw new Error(
+    `resolved unexpected DSH approval artifact: ${installedManifest.name}@${installedManifest.version}`,
   );
 }
 
@@ -75,7 +83,7 @@ function stringLiteralUnion(source, typeName) {
 }
 
 const installedOutcomes = stringLiteralUnion(
-  readFileSync(candidates[0], "utf8"),
+  readFileSync(installedDeclaration, "utf8"),
   "ApprovalOutcome",
 );
 const localOutcomes = stringLiteralUnion(
