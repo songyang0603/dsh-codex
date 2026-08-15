@@ -1,103 +1,156 @@
 # dsh-codex
 
-本项目把 Codex 拆成一个个可独立安装的 DeepSeek Harness（DSH）组件，再由这些组件组装出 Codex 等价的 coding agent。
+[English](README.md) | **简体中文**
 
-它不会调用原生 `codex` 二进制，也不会把 Codex 当成一次性 subagent。运行时由 DSH 自己承载；每个组件都对齐固定的 Codex 上游快照：
-`086396f7f60347b74c82784d5dfaf4fb2d3bda12`。
+> 把 OpenAI Codex 重建为精确、可独立安装的 DeepSeek Harness 组件。
 
-## 原则：做成一个，精确一个
+`dsh-codex` 将 Codex 拆成职责清晰的 DSH 插件，再把这些插件组合成 coding agent。运行时由 DSH 自己承载：组件不会调用 `codex` 二进制，也不会把 Codex 当成 subagent 委托任务。
 
-组件可以把边界划清楚，但不能在边界内部降低标准。只有上游实现、独立 oracle、DSH 真实 Loader、失败语义和适用平台证据都闭合后，组件才能标记为 `parity_verified`。不会用“基本可用”“大致兼容”代替完成。
+每个已完成组件都复现 OpenAI Codex 固定提交 [`086396f`](https://github.com/openai/codex/tree/086396f7f60347b74c82784d5dfaf4fb2d3bda12) 中一个定义明确的边界。原则很简单：组件可以小，但声明边界内的行为必须精确。
 
-目前的组件：
+仓库仍在持续开发。目前有三个基础组件通过验证；只安装它们还**不能**得到完整 Codex agent。
 
-| 包                                           | 职责                                                                                      | 状态                                            |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `@songyang0603/dsh-codex-execpolicy`         | policy/config 装载、命令分类、approval requirement 推导、canonical migration 与规则持久化 | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
-| `@songyang0603/dsh-codex-approval`           | 无损 rich approval 协议、pending correlation 与 live-session cache                        | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
-| `@songyang0603/dsh-codex-apply-patch-engine` | 解析、调用识别、校验、本地变更与 committed delta                                          | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
+## 为什么做 dsh-codex？
 
-`execpolicy` 不再公开一个近似的通用 DSH `bash` enforcement。原因是 stock DSH Bash 无法精确消费 Codex 的 `bypassSandbox`、managed network、rich approval 和 retry 语义，还可能产生第二次审批。后续由独立的 `approval`、`shell`、`sandbox`、`network` 组件精确串接；这属于组件拆分，不是降低最终目标。
+DeepSeek Harness 以可组合插件为核心。`dsh-codex` 利用这种架构，把 Codex 子系统变成拥有明确状态、生命周期、安装方式和 conformance 边界的 DSH 服务。
 
-完整拆分见 [docs/components.md](docs/components.md)，组件目录与状态所有权约定见
-[docs/component-package-contract.md](docs/component-package-contract.md)，完成标准见
-[docs/parity-standard.md](docs/parity-standard.md)。
+这样可以：
 
-## DSH 生态与安装契约
+- 一次安装、验证一个 Codex 能力；
+- 在不同 DSH coding-agent profile 中复用同一个组件；
+- 替换或组合组件，而不把行为藏进单体 wrapper；
+- 把每个已完成边界与固定上游实现逐项比较；
+- 最终构建 DSH 原生 coding agent，而不是原生 Codex 二进制的桥接器。
 
-这是组件 monorepo，不是一个不透明的单体插件。每个可独立安装的包都必须拥有自己的 `dsh.bundle.patch`、唯一 profile row、编译入口、包内说明和精确 DSH peer；测试与 conformance 源码保留在 GitHub 供贡献者复现，但不会进入面向用户的 npm/tarball 归档。
+## 已完成组件
 
-仓库根目录目前不伪装成“安装一次就得到全部 Codex”的 bundle。在版本化 canonical composition profile 完成之前，不应把 `github:songyang0603/dsh-codex` 当成整套组件的安装命令。从源码使用时显式安装对应 package；未来 registry 发布按组件分别发布 npm 包，含 native 的组件提供预编译平台产物。
+| 组件                                                                        | 提供的能力                                                                      | 状态                                         |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------- |
+| [`@songyang0603/dsh-codex-execpolicy`](packages/execpolicy)                 | Codex policy/config 发现、命令分类、approval requirement 推导、迁移与规则持久化 | `0.1.0` · macOS arm64 源码 `parity_verified` |
+| [`@songyang0603/dsh-codex-approval`](packages/approval)                     | 无损 rich approval 协议、pending 请求关联、取消和 live-session approval cache   | `0.1.0` · macOS arm64 源码 `parity_verified` |
+| [`@songyang0603/dsh-codex-apply-patch-engine`](packages/apply-patch-engine) | apply-patch 解析、调用识别、校验、本地变更与有序 committed delta                | `0.1.0` · macOS arm64 源码 `parity_verified` |
 
-这些规则来自对两个公开 awesome 列表及 `dsh-plugin` topic catalog 中每个可访问目标的固定 SHA 源码研究，并结合官方 rc.6 行为。逐插件覆盖、实现记录、社区安装器之间的冲突以及本项目实际采用的规则见 [docs/ecosystem-compatibility.md](docs/ecosystem-compatibility.md)。
+Codex 的完整拆分见[组件地图](docs/components.md)，`parity_verified` 的完成标准见[精确性标准](docs/parity-standard.md)。
 
-## approval 当前证据
+## 快速开始
 
-approval `0.1.0` 的 macOS arm64 源码组件已经达到 `parity_verified`：独立上游/固定源码比较 `43/43`，DSH 自有 adapter contract `10/10`。它强制让原始 app-server JSON 先进入直接依赖固定 Codex crate 的 Rust serde，因此能无损保留 `i64::MAX` 与 64 位 `usize::MAX`，同时拒绝相邻 overflow 值。49 个包测试覆盖跨 thread pending 隔离、恶意 backend fail-closed、多 variant decision 拒绝和超过旧 8 MiB 上限的合法请求；全新 DSH rc.6 profile 还从归档核对并启动 package-local native，验证同 owner 请求被替换后旧 token 不能误批新请求，再完成卸载。
+需要 Node.js 22.19+、pnpm 10.19、Rust 1.95.0 和 DeepSeek Harness `0.1.0-rc.6`。
 
-该边界只包含 rich command-approval wire、pending correlation/cancellation、通用 live-session approval cache，以及 execpolicy amendment 的持久化先于本次放行。rich UI、canonical shell/sandbox/network consumer、完整 app-server turn transport，以及未实跑的 Linux/Windows 都不在这项完成声明内。
-
-## execpolicy 当前证据
-
-`0.1.0` 的 macOS arm64 源码组件已经达到 `parity_verified`，并通过四组独立、由固定 Codex 源码编译出的差分 oracle：
-
-- runtime policy requirement：`68/68`；
-- materialized config stack：`6/6`；
-- 真实 host config discovery：`11/11`；
-- startup migration 与规则持久化：`16/16`。
-
-Rust engine 直接依赖固定 revision 的 Codex 公共 crates；必须适配的 `codex-core` 私有行为带有显著修改声明，并与同一 commit 的临时 instrumented build 对照。候选实现不会充当自己的 oracle。
-
-组件还通过了 18 个 TypeScript/native/真实 Loader 测试。独立 smoke test 会先把组件打成归档，再把归档和精确版本的 Cordis peer 安装到全新的 DSH `0.1.0-rc.6` profile；它会核对归档中的 native 与 SHA-256，随后真实启动并卸载 bundle，且无法退回仓库内的编译产物。
-
-这些是有明确语料和平台边界的本地证据，不代表完整 coding agent 已经完成。Linux、macOS、Windows 的 CI 配置只有真正跑过以后才算对应平台证据。命令、哈希、曾经失败的尝试和未覆盖范围都记录在 `conformance/*/STATUS.md`。
-
-## apply-patch engine 当前证据
-
-`0.1.0` 的 macOS arm64 语义引擎已经达到 `parity_verified`。native sidecar 直接链接固定 revision 的 `codex-apply-patch` 公共实现，上游 96 个 library/CLI/scenario 测试全部通过；独立 23-case oracle 再从生产 TypeScript client 经真实 native 协议，对照固定上游 API，覆盖 parse/stream/invocation 错误、原始 stdout/stderr、有序 committed delta、部分失败、精确文件字节、Unix mode 和不跟随 symlink 的效果，结果 `23/23` 一致。组件另外通过 10 个 native 测试、6 个 TypeScript/native/真实 Loader 测试，以及全新 DSH rc.6 profile 中仅依赖归档内 native 的 add/activate/mutate/remove 检查。
-
-该完成声明只属于语义/文件系统引擎。安装它不会注册模型可见的 `apply_patch` 工具。Codex 的 freeform provider wire、环境选择、safety、rich approval、平台 sandbox/retry、hooks/events、TurnDiff、agent/session 行为，以及尚未实跑的 Linux/Windows 都是独立的未完成边界。
-
-## 从源码使用
-
-需要 Node.js 22.19+、pnpm 10.19 和 Rust 1.95.0。
-
-```sh
+```bash
+git clone https://github.com/songyang0603/dsh-codex.git
+cd dsh-codex
 pnpm install
 pnpm native:stage
-pnpm --filter @songyang0603/dsh-codex-execpolicy build
-pnpm --filter @songyang0603/dsh-codex-approval build
-pnpm --filter @songyang0603/dsh-codex-apply-patch-engine build
+pnpm build
 ```
 
-`native:stage` 会编译当前平台 sidecar，核对 protocol 与全部上游身份，再把二进制和 SHA-256 暂存到组件自己的 native 目录。生成的二进制不会进入 Git。
+把三个已完成组件安装到同一个本地 DSH profile：
 
-安装了 DSH CLI 后，可以把本地组件作为 bundle 加进 profile：
-
-```sh
+```bash
 dsh plugin --profile codex-dev add ./packages/execpolicy
-dsh plugin --profile codex-approval-dev add ./packages/approval
-dsh plugin --profile codex-apply-patch-dev add ./packages/apply-patch-engine
+dsh plugin --profile codex-dev add ./packages/approval
+dsh plugin --profile codex-dev add ./packages/apply-patch-engine
 dsh --profile codex-dev --dump-config
 ```
 
-精确版本的 Cordis peer 会通过 DSH profile 自身的依赖回退解析，保证插件和 DSH 使用同一个 Context 实例。这个 bundle 会挂载 `ctx.codexExecPolicy`，并按 Codex 的本地规则发现、启动迁移和默认规则路径打开 policy。它本身只提供精确语义服务；等 `approval`、`shell`、`sandbox`、`network` 等消费者完成后，组合起来才是完整 Codex。
-
-首个版本只发布源码；目前不宣称已经发布 npm 包或 GitHub native binary。
-
-API 与配置示例见 [packages/execpolicy/README.md](packages/execpolicy/README.md)、[packages/approval/README.md](packages/approval/README.md) 和 [packages/apply-patch-engine/README.md](packages/apply-patch-engine/README.md)。
-
-## 文件组织
+这些 bundle 会挂载三个 Cordis 服务：
 
 ```text
-crates/                 原生语义 engine
-packages/<component>/   可独立安装的 DSH 组件
-conformance/<boundary>/ 独立上游 oracle 与小型固定 corpus
-docs/                   架构、组件账本、证据边界
-scripts/                上游 pin 校验与 native 暂存
-upstreams.lock.json     Git/npm 身份锁定
+ctx.codexExecPolicy
+ctx.codexApproval
+ctx.codexApplyPatch
 ```
 
-临时 JSONL、Cargo target、编译产物和本机二进制都不会提交。小型 conformance corpus 与 oracle instrumentation 属于可复现源码，会保留给开源贡献者。
+`native:stage` 会编译当前平台的 Rust sidecar，核对协议和固定上游源码身份，再写入包内二进制与 SHA-256 文件。生成的二进制不会提交到 Git。
+
+目前组件只从源码使用；尚未宣称发布 npm 包或 GitHub native binary。
+
+## 工作方式
+
+```text
+固定 Codex 源码
+      │
+      ├── 原生语义引擎（Rust）
+      │       └── 精确上游类型与行为
+      │
+      ├── DSH 组件包（TypeScript + Cordis）
+      │       └── 生命周期、IPC、校验与服务所有权
+      │
+      ├── canonical composition profile（开发中）
+      │       └── shell、sandbox、network、provider、session 与 UI
+      │
+      └── 独立 conformance 套件
+              └── 固定上游 oracle ↔ 生产组件
+```
+
+当 TypeScript 重写容易引入语义漂移时，组件使用 native sidecar。DSH 包负责进程生命周期并暴露类型化 Cordis 服务；approval、sandbox、network 和执行顺序由独立消费者组件拥有，避免双重提示或隐藏 bypass。
+
+每个可安装包都有自己的 `dsh.bundle.patch`、profile row、编译入口、说明、许可声明和精确 peer。仓库根目录是组件 workspace，不是一个可安装的全家桶 bundle。
+
+## 当前精确性证据
+
+| 边界                 | 独立比较                                                                                   | 包与运行时检查                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Execpolicy           | runtime `68/68`；config stack `6/6`；host discovery `11/11`；migration/persistence `16/16` | 18 个 TypeScript/native/真实 Loader 测试，以及全新 DSH rc.6 归档 smoke test        |
+| Approval             | 上游/固定源码 `43/43`；DSH adapter contract `10/10`                                        | 49 个包测试，以及全新 DSH rc.6 add/activate/remove profile 测试                    |
+| Apply-patch 语义引擎 | 固定上游 96 个测试全部通过；差分 oracle `23/23`                                            | 10 个 native 测试、6 个 TypeScript/native/真实 Loader 测试和全新归档 mutation 测试 |
+
+Oracle 由固定上游源码编译，候选输出不会充当自己的 oracle。精确命令、身份、哈希、失败记录和排除范围位于 [`conformance/*/STATUS.md`](conformance) 与 [`upstreams.lock.json`](upstreams.lock.json)。
+
+平台声明刻意保持窄范围：上表是已经执行的 macOS arm64 源码证据。Linux 或 Windows CI 只有真正运行后，才会成为对应平台证据。
+
+## 当前边界与路线图
+
+`dsh-codex` 还不是完整 Codex 替代品。Canonical composition 仍需精确实现并串接：
+
+- model provider 与 freeform tool transport；
+- canonical shell 执行与 sandbox retry；
+- managed network 与 network approval；
+- instructions、sessions、compaction、memory 与 subagents；
+- hooks、events、TurnDiff、CLI 与 UI。
+
+当前 apply-patch 包是精确语义/文件系统引擎，还不是模型可见的 `apply_patch` 工具。Execpolicy 也不会直接 gate stock DSH Bash：stock Bash 无法在不产生可观察差异的前提下消费 Codex `bypassSandbox`、rich approval、managed network 与 retry 语义。
+
+最终目标仍是通过 DSH 组件得到完整 Codex 行为。未完成的 composition 会被明确记录为未完成，不会用低保真实现替代。
+
+## 仓库内容
+
+```text
+crates/                 原生语义引擎
+packages/<component>/   可独立安装的 DSH 插件
+conformance/<boundary>/ 独立上游 oracle 与小型 corpus
+docs/                   架构、包契约与精确性边界
+research/               固定版本的 DSH 生态插件实现研究
+scripts/                pin 校验、打包与 native staging
+upstreams.lock.json     机器可读的 Git/npm 身份
+```
+
+临时 JSONL、Cargo target、包构建产物和 native binary 不会提交。小型 corpus 与只用于测试的上游 instrumentation 会保留，让贡献者能够复现 parity 声明。
+
+## 开发
+
+```bash
+pnpm check
+```
+
+重量级 conformance workflow 会单独运行，因为它们需要编译固定的 Codex 上游 crate。每个组件的命令和 API 见：
+
+- [Execpolicy](packages/execpolicy/README.md)
+- [Approval](packages/approval/README.md)
+- [Apply-patch 语义引擎](packages/apply-patch-engine/README.md)
+
+## 参与贡献
+
+欢迎提交 Issue 和 Pull Request。新组件应拥有一个清晰子系统边界，可以独立安装，遵守 DSH 生命周期语义，固定上游身份，并在声明 parity 前提供可复现的 conformance 证据。
+
+建议先阅读[组件包契约](docs/component-package-contract.md)、[组件地图](docs/components.md)和 [DSH 生态兼容性研究](docs/ecosystem-compatibility.md)。
+
+## 上游与独立性
 
 本项目是独立社区项目，与 OpenAI 或 DeepSeek 不存在隶属、背书或赞助关系。
+
+OpenAI Codex 与 DeepSeek Harness 是彼此独立的上游项目。这里使用它们的名称，是为了标识研究和集成对象，并不表示官方身份。
+
+## 许可
+
+Apache-2.0。参见 [LICENSE](LICENSE)、[NOTICE](NOTICE)、[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 与 [UPSTREAMS.md](UPSTREAMS.md)。
