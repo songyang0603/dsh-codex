@@ -110,21 +110,6 @@ A Windows- or Linux-shaped case executed on macOS does not count as evidence for
 
 See [platform support and evidence](docs/platform-support.md) for the exact policy.
 
-## 🗺️ Next TODO
-
-The next work should follow dependency order rather than adding disconnected tools:
-
-1. **macOS sandbox component** — reproduce pinned Codex Seatbelt profiles, permission projection, denial detection, and retry inputs as an independently verified service.
-2. **Canonical shell component** — own argv/cwd/env normalization, execpolicy evaluation, rich approval, sandbox attempts, process launch, and exact result ordering without stock-DSH double prompts.
-3. **Freeform tool transport** — extend the DSH model/provider path so Codex custom tools can carry raw freeform input instead of being approximated as JSON Schema functions.
-4. **Model-visible `apply_patch` component** — compose freeform transport, the verified apply-patch engine, approval, macOS sandboxing, hooks/events, and TurnDiff.
-5. **Managed network component** — implement proxy state, network approval, session grants, persistent amendments, and live-policy refresh.
-6. **Canonical agent profile** — assemble instructions, model provider, tools, session/resume, compaction, memory, subagents, CLI, and UI into the first end-to-end `dsh-codex` profile.
-
-The current apply-patch package is the exact semantic/filesystem engine, not yet a model-visible `apply_patch` tool. Likewise, execpolicy intentionally does not gate stock DSH Bash: stock Bash cannot consume Codex `bypassSandbox`, rich approval, managed-network, and retry semantics without observable differences.
-
-The target remains full Codex behavior through DSH components. Unfinished composition is documented as unfinished rather than replaced with a lower-fidelity shortcut.
-
 ## 📁 Repository contents
 
 ```text

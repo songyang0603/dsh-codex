@@ -110,21 +110,6 @@ Oracle 由固定上游源码编译，候选输出不会充当自己的 oracle。
 
 精确策略见[平台支持与证据](docs/platform-support.md)。
 
-## 🗺️ 下一步 TODO
-
-下一阶段应按依赖顺序推进，而不是继续增加彼此断开的工具：
-
-1. **macOS sandbox 组件**：精确复现固定 Codex Seatbelt profile、permission projection、denial detection 与 retry 输入，并作为独立 service 验证。
-2. **Canonical shell 组件**：统一拥有 argv/cwd/env、execpolicy、rich approval、sandbox attempt、process launch 与结果顺序，避免 stock DSH 的双重审批。
-3. **Freeform tool transport**：扩展 DSH model/provider 路径，让 Codex custom tool 传递原始 freeform 输入，而不是近似成 JSON Schema function。
-4. **模型可见 `apply_patch` 组件**：组合 freeform transport、已验证 apply-patch engine、approval、macOS sandbox、hooks/events 与 TurnDiff。
-5. **Managed network 组件**：实现 proxy state、network approval、session grant、持久 amendment 与实时 policy refresh。
-6. **Canonical agent profile**：组合 instructions、model provider、tools、session/resume、compaction、memory、subagents、CLI 与 UI，形成首个端到端 `dsh-codex` profile。
-
-当前 apply-patch 包是精确语义/文件系统引擎，还不是模型可见的 `apply_patch` 工具。Execpolicy 也不会直接 gate stock DSH Bash：stock Bash 无法在不产生可观察差异的前提下消费 Codex `bypassSandbox`、rich approval、managed network 与 retry 语义。
-
-最终目标仍是通过 DSH 组件得到完整 Codex 行为。未完成的 composition 会被明确记录为未完成，不会用低保真实现替代。
-
 ## 📁 仓库内容
 
 ```text

@@ -4,14 +4,19 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Dependency revisions are coordinated with the pinned parity evidence.
+    # Keep security updates available without opening routine version PRs.
+    open-pull-requests-limit: 0
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
   - package-ecosystem: cargo
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 0
     ignore:
       # Codex dependency movement is handled only through the explicit
       # upstream-drift process and differential evidence.
