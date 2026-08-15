@@ -97,7 +97,7 @@ Every installable package has its own `dsh.bundle.patch`, profile row, compiled 
 
 The oracles are built from the pinned upstream source; candidate output never serves as its own oracle. Exact commands, identities, hashes, failures, and exclusions live under [`conformance/*/STATUS.md`](conformance) and in [`upstreams.lock.json`](upstreams.lock.json).
 
-Platform claims are deliberately narrow. The rows above describe executed macOS arm64 source evidence. A configured Linux or Windows CI job becomes platform evidence only after it has actually run.
+Platform support is deliberately narrow: this project currently targets macOS. The rows above describe executed macOS arm64 source evidence; macOS x64 remains a build/packaging compatibility lane until its own parity corpus is executed. Linux and Windows are outside the current support claim.
 
 ## Current limits and roadmap
 

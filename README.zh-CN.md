@@ -97,7 +97,7 @@ ctx.codexApplyPatch
 
 Oracle 由固定上游源码编译，候选输出不会充当自己的 oracle。精确命令、身份、哈希、失败记录和排除范围位于 [`conformance/*/STATUS.md`](conformance) 与 [`upstreams.lock.json`](upstreams.lock.json)。
 
-平台声明刻意保持窄范围：上表是已经执行的 macOS arm64 源码证据。Linux 或 Windows CI 只有真正运行后，才会成为对应平台证据。
+平台支持刻意保持窄范围：本项目目前只面向 macOS。上表是已经执行的 macOS arm64 源码证据；macOS x64 在运行独立 parity corpus 之前只作为构建/打包兼容通道。Linux 与 Windows 不在当前支持声明内。
 
 ## 当前边界与路线图
 

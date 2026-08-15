@@ -126,24 +126,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Linux x64
-            runner: ubuntu-24.04
-            lint: true
-            package: true
-            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
-            approval_engine: target/release/dsh-codex-approval-protocol-engine
-            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
-          - name: Linux arm64
-            runner: ubuntu-24.04-arm
-            lint: false
-            package: false
-            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
-            approval_engine: target/release/dsh-codex-approval-protocol-engine
-            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: macOS arm64
             runner: macos-15
-            lint: false
-            package: false
+            lint: true
+            package: true
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
             apply_patch_engine: target/release/dsh-codex-apply-patch-engine
@@ -154,13 +140,6 @@ jobs:
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
             apply_patch_engine: target/release/dsh-codex-apply-patch-engine
-          - name: Windows x64
-            runner: windows-2022
-            lint: false
-            package: false
-            execpolicy_engine: target/release/dsh-codex-execpolicy-engine.exe
-            approval_engine: target/release/dsh-codex-approval-protocol-engine.exe
-            apply_patch_engine: target/release/dsh-codex-apply-patch-engine.exe
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:
