@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "upstreams": {
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "commit": "086396f7f60347b74c82784d5dfaf4fb2d3bda12",
+      "verifiedAt": "2026-08-15",
+      "license": "Apache-2.0",
+      "components": {
+        "execpolicy": {
+          "path": "codex-rs/execpolicy",
+          "gitObjectType": "tree",
+          "gitObject": "e06e0b4ad718af8a74055a33b1536b25fb9d4a87"
+        },
+        "shellCommand": {
+          "path": "codex-rs/shell-command",
+          "gitObjectType": "tree",
+          "gitObject": "3f5da93a61be77795d3fc5bb3d6e44a9dec1d106"
+        },
+        "config": {
+          "path": "codex-rs/config",
+          "gitObjectType": "tree",
+          "gitObject": "d3f4925b575b128dd1f0f74a5babcdb1efce0219"
+        },
+        "execServer": {
+          "path": "codex-rs/exec-server",
+          "gitObjectType": "tree",
+          "gitObject": "51751785508060e633f0e0472fa0d2572787b36a"
+        },
+        "utilsCli": {
+          "path": "codex-rs/utils/cli",
+          "gitObjectType": "tree",
+          "gitObject": "5d9c72fcadefb9a1c95e38c4726d25c5b8d195ee"
+        },
+        "utilsHomeDir": {
+          "path": "codex-rs/utils/home-dir",
+          "gitObjectType": "tree",
+          "gitObject": "c2d10a4f4844c2a517584ee623a0b8aa4ceb44f5"
+        },
+        "cargoLock": {
+          "path": "codex-rs/Cargo.lock",
+          "gitObjectType": "blob",
+          "gitObject": "a8c2addc02055be48c345b65760a7a1b96cfbf28"
+        },
+        "coreExecPolicyFile": {
+          "path": "codex-rs/core/src/exec_policy.rs",
+          "gitObjectType": "blob",
+          "gitObject": "5de05937533a2653a700b4ec40cda09578761f50"
+        },
+        "coreExecPolicyDirectory": {
+          "path": "codex-rs/core/src/exec_policy",
+          "gitObjectType": "tree",
+          "gitObject": "b313a3ba1b113f08e3c1686272162910dad76540"
+        }
+      }
+    },
+    "deepseekHarness": {
+      "repository": "https://github.com/deepseek-ai/DeepSeek-Harness",
+      "commit": "47f943859bef60e4160492346772ded9b24f765a",
+      "sourceVersion": "0.1.0-rc.5",
+      "verifiedAt": "2026-08-15",
+      "license": "MIT",
+      "npmArtifacts": {
+        "@deepseek-ai/dsh": {
+          "version": "0.1.0-rc.6",
+          "integrity": "sha512-brpZfED7ieRa2PQ5tUxMhHrM1pb2CmKFVM/f6yMULBDMicahk+Z2OsHgTwTDnoiZm23Ftu9rQz0NN4pflaoJcg==",
+          "shasum": "de9fbf39056c7f4e658a3e284cb1d66ebc86d040",
+          "gitHead": null
+        },
+        "@deepseek-ai/cordis": {
+          "version": "4.0.1",
+          "integrity": "sha512-YBdskTU2Po1kru3GgcUWUbkTsPMA9LkSQDAY8rBkFJeajdgcQad3QPJZE26JyK99Xb6HaASvoXg2DSUTeN/0Nw=="
+        },
+        "@deepseek-ai/cordis-plugin-include": {
+          "version": "1.0.6",
+          "integrity": "sha512-i1VXrZCbv6tk/iUgedCNjrxxArbWT3IvRZGB5sdqJ3ectnihivXXQbRZ8JJ73DSmAPvlMGmrbtjFAfm10yvXRg==",
+          "direct": false
+        },
+        "@deepseek-ai/cordis-plugin-loader": {
+          "version": "1.0.2",
+          "integrity": "sha512-RIW9hoVyhYDWdCI9BsvtZccPde1ECLC4OAxupwowGTak78vwVTVdb3HezTSOK1Y1/Ax3Ru0LA1pYOB04CnTxIQ=="
+        },
+        "@deepseek-ai/schemastery": {
+          "version": "3.18.1",
+          "integrity": "sha512-Qn0FCSwCQnpnj6SB31I6i2sIKgKWnkbJM8O0EU91Gv2UsYVvtZTl6IA0sCwk2e2MZf5S8w5hpq9QkeVvK9qwxg=="
+        }
+      },
+      "components": {
+        "cli": {
+          "path": "apps/cli",
+          "gitObjectType": "tree",
+          "gitObject": "45aafeacfa60962bb6103040abc01825eca6e7bf",
+          "packageVersion": "0.1.0-rc.5"
+        },
+        "cordis": {
+          "path": "vendor/cordis",
+          "gitObjectType": "tree",
+          "gitObject": "dc2b8d4a620d54905924416820a661b977208d94",
+          "packageVersion": "4.0.1"
+        },
+        "schemastery": {
+          "path": "vendor/schemastery",
+          "gitObjectType": "tree",
+          "gitObject": "04553871d4f0a1cd989d2731c9e089e057de1fc0",
+          "packageVersion": "3.18.1"
+        },
+        "appBoot": {
+          "path": "packages/boot/app-boot",
+          "gitObjectType": "tree",
+          "gitObject": "78ebdf2b70ea2b84043d35663d517a4df16de216",
+          "packageVersion": "0.1.0-rc.5"
+        },
+        "loader": {
+          "path": "vendor/loader",
+          "gitObjectType": "tree",
+          "gitObject": "8d3d338df480165b542f8901abeb92b31c8430af",
+          "packageVersion": "1.0.2"
+        },
+        "include": {
+          "path": "vendor/include",
+          "gitObjectType": "tree",
+          "gitObject": "8d8a71d82ac87348969ffeffe1bab0d454631bb0",
+          "packageVersion": "1.0.6"
+        }
+      }
+    }
+  }
+}

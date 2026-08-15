@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/upstream-runtime/corpus.schema.json",
+  "title": "dsh-codex upstream runtime-policy corpus line",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "policy", "request"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "requiresWindowsPowerShell": {
+      "type": "boolean",
+      "default": false,
+      "description": "On Windows, fail closed unless powershell.exe is runnable; ignored on other operating systems."
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identifier", "source"],
+      "properties": {
+        "identifier": { "type": "string", "minLength": 1 },
+        "source": { "type": "string" }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "approvalPolicy",
+        "permissionProfile",
+        "windowsSandboxLevel",
+        "sandboxPermissions"
+      ],
+      "properties": {
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "approvalPolicy": { "$ref": "#/$defs/approvalPolicy" },
+        "permissionProfile": { "$ref": "#/$defs/permissionProfile" },
+        "windowsSandboxLevel": {
+          "enum": ["disabled", "restricted_token", "elevated"]
+        },
+        "sandboxPermissions": {
+          "enum": [
+            "use_default",
+            "require_escalated",
+            "with_additional_permissions"
+          ]
+        },
+        "prefixRule": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "allowPrefixRules": {
+          "enum": ["honor", "ignore_for_cyber_model"],
+          "default": "honor"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "approvalPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["unless_trusted", "on_request", "never"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "sandboxApproval", "rules"],
+          "properties": {
+            "kind": { "const": "granular" },
+            "sandboxApproval": { "type": "boolean" },
+            "rules": { "type": "boolean" }
+          }
+        }
+      ]
+    },
+    "permissionProfile": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["disabled", "external"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "fileSystem", "hasFullDiskWriteAccess"],
+          "properties": {
+            "kind": { "const": "managed" },
+            "fileSystem": { "enum": ["restricted", "unrestricted"] },
+            "hasFullDiskWriteAccess": { "type": "boolean" }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": { "fileSystem": { "const": "unrestricted" } },
+                "required": ["fileSystem"]
+              },
+              "then": {
+                "properties": { "hasFullDiskWriteAccess": { "const": true } }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

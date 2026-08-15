@@ -1,0 +1,20 @@
+# Install the exact execpolicy semantic service. Execution, approval, sandbox,
+# and network-proxy consumers are separate dsh-codex components.
+- insert:
+    - id: dsh-codex-execpolicy
+      name: "@songyang0603/dsh-codex-execpolicy"
+      config:
+        hostConfigStack:
+          schemaVersion: 1
+          codexHome:
+            mode: discover
+          cwd:
+            mode: current_process
+          cliOverrides: []
+          strictConfig: false
+          ignoreUserConfig: false
+          ignoreUserAndProjectExecPolicyRules: false
+          cloud:
+            mode: not_requested
+          threadConfig:
+            mode: none

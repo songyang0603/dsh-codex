@@ -1,0 +1,13 @@
+diff --git a/codex-rs/core/src/exec_policy.rs b/codex-rs/core/src/exec_policy.rs
+index 5de059375..7628fe810 100644
+--- a/codex-rs/core/src/exec_policy.rs
++++ b/codex-rs/core/src/exec_policy.rs
+@@ -1151,3 +1151,7 @@ async fn collect_policy_files(dir: &Path) -> Result<Vec<PathBuf>, ExecPolicyErro
+ #[cfg(test)]
+ #[path = "exec_policy_tests.rs"]
+ mod tests;
++
++#[cfg(test)]
++#[path = "exec_policy_runtime_oracle.rs"]
++mod dsh_codex_runtime_oracle;
+

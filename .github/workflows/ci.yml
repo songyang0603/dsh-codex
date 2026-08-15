@@ -1,0 +1,190 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: "1"
+
+jobs:
+  provenance:
+    name: Upstream provenance
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out dsh-codex
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check out pinned Codex sources
+        uses: actions/checkout@v4
+        with:
+          repository: openai/codex
+          ref: 086396f7f60347b74c82784d5dfaf4fb2d3bda12
+          path: .upstream/codex
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: |
+            codex-rs/Cargo.lock
+            codex-rs/config
+            codex-rs/exec-server
+            codex-rs/execpolicy
+            codex-rs/shell-command
+            codex-rs/core/src/exec_policy.rs
+            codex-rs/core/src/exec_policy
+            codex-rs/utils/cli
+            codex-rs/utils/home-dir
+
+      - name: Check out pinned DeepSeek Harness sources
+        uses: actions/checkout@v4
+        with:
+          repository: deepseek-ai/DeepSeek-Harness
+          ref: 47f943859bef60e4160492346772ded9b24f765a
+          path: .upstream/deepseek-harness
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: |
+            apps/cli
+            vendor/cordis
+            vendor/include
+            vendor/loader
+            vendor/schemastery
+            packages/boot/app-boot
+
+      - name: Verify source objects and dependency revisions
+        run: >-
+          node scripts/verify-upstream-pins.mjs
+          --codex .upstream/codex
+          --deepseek-harness .upstream/deepseek-harness
+
+      - name: Verify runtime-oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/upstream-runtime/instrumentation.patch"
+
+      - name: Verify config-stack oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/config-stack/instrumentation.patch"
+
+      - name: Verify persistence oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/persistence/instrumentation.patch"
+
+      - name: Verify host-config oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/host-config/instrumentation.patch"
+
+  component:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            lint: true
+            package: true
+            engine: target/release/dsh-codex-execpolicy-engine
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            lint: false
+            package: false
+            engine: target/release/dsh-codex-execpolicy-engine
+          - name: macOS arm64
+            runner: macos-15
+            lint: false
+            package: false
+            engine: target/release/dsh-codex-execpolicy-engine
+          - name: macOS x64
+            runner: macos-15-intel
+            lint: false
+            package: false
+            engine: target/release/dsh-codex-execpolicy-engine
+          - name: Windows x64
+            runner: windows-2022
+            lint: false
+            package: false
+            engine: target/release/dsh-codex-execpolicy-engine.exe
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.20.0
+          cache: pnpm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+          components: rustfmt, clippy
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check Rust formatting
+        if: matrix.lint
+        run: cargo fmt --all -- --check
+
+      - name: Lint native component
+        run: cargo clippy --locked --workspace --all-targets -- -D warnings
+
+      - name: Test native component
+        run: cargo test --locked --workspace
+
+      - name: Build native sidecar for adapter tests
+        run: cargo build --locked --workspace
+
+      - name: Build release sidecar for the installable source package
+        run: >-
+          cargo build --locked --release
+          --package dsh-codex-execpolicy-engine
+
+      - name: Verify and stage the native sidecar
+        run: node scripts/stage-execpolicy-native.mjs --binary ${{ matrix.engine }}
+
+      - name: Check TypeScript types
+        run: pnpm typecheck
+
+      - name: Test DSH adapter
+        run: pnpm test
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Install and activate the execpolicy bundle in a clean DSH profile
+        run: pnpm profile:check
+
+      - name: Check publishable package contents
+        if: matrix.package
+        run: pnpm pack:check

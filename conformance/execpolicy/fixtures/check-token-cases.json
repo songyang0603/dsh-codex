@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "policyIdentifier": "conformance/execpolicy/fixtures/policy.star",
+  "cases": [
+    {
+      "name": "explicit broad allow",
+      "commands": [["git", "status"]],
+      "resolveHostExecutables": false
+    },
+    {
+      "name": "more specific prompt remains strictest",
+      "commands": [["git", "push", "origin", "main"]],
+      "resolveHostExecutables": false
+    },
+    {
+      "name": "forbidden wins across multiple commands",
+      "commands": [
+        ["git", "status"],
+        ["rm", "-rf", "build"]
+      ],
+      "resolveHostExecutables": false
+    },
+    {
+      "name": "unmatched command uses allow fallback",
+      "commands": [["custom-tool", "inspect"]],
+      "fallbackDecision": "allow",
+      "resolveHostExecutables": false
+    },
+    {
+      "name": "unmatched command uses forbidden fallback",
+      "commands": [["custom-tool", "mutate"]],
+      "fallbackDecision": "forbidden",
+      "resolveHostExecutables": false
+    },
+    {
+      "name": "unmatched command without fallback has no decision",
+      "commands": [["custom-tool", "unknown"]],
+      "resolveHostExecutables": false
+    }
+  ]
+}

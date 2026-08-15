@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/config-stack/candidate-output.schema.json",
+  "title": "dsh-codex config-stack candidate output record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "engine", "result"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "engine": {
+      "type": "object",
+      "required": [
+        "protocolVersion",
+        "codexCommit",
+        "configTree",
+        "execServerTree",
+        "utilsCliTree",
+        "utilsHomeDirTree",
+        "execpolicyTree",
+        "cargoLockBlob",
+        "coreExecPolicyBlob",
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "protocolVersion": { "const": 3 },
+        "codexCommit": { "const": "086396f7f60347b74c82784d5dfaf4fb2d3bda12" },
+        "configTree": { "const": "d3f4925b575b128dd1f0f74a5babcdb1efce0219" },
+        "execServerTree": {
+          "const": "51751785508060e633f0e0472fa0d2572787b36a"
+        },
+        "utilsCliTree": { "const": "5d9c72fcadefb9a1c95e38c4726d25c5b8d195ee" },
+        "utilsHomeDirTree": {
+          "const": "c2d10a4f4844c2a517584ee623a0b8aa4ceb44f5"
+        },
+        "execpolicyTree": {
+          "const": "e06e0b4ad718af8a74055a33b1536b25fb9d4a87"
+        },
+        "cargoLockBlob": {
+          "const": "a8c2addc02055be48c345b65760a7a1b96cfbf28"
+        },
+        "coreExecPolicyBlob": {
+          "const": "5de05937533a2653a700b4ec40cda09578761f50"
+        },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 }
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stackError"],
+          "properties": {
+            "stackError": {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "const": "invalid_config_stack" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stack",
+            "discoveredRuleFiles",
+            "requirements",
+            "policy"
+          ],
+          "properties": {
+            "stack": { "type": "object" },
+            "discoveredRuleFiles": { "type": "array" },
+            "requirements": { "type": "object" },
+            "policy": { "type": "object" }
+          }
+        }
+      ]
+    }
+  }
+}

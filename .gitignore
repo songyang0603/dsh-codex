@@ -1,0 +1,17 @@
+node_modules/
+lib/
+dist/
+coverage/
+.turbo/
+target/
+.upstream/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Locally built native engines and downloaded conformance oracles.
+.artifacts/
+.upstream-worktrees/
+packages/execpolicy/native/

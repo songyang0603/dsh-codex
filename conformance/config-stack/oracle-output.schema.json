@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/config-stack/oracle-output.schema.json",
+  "title": "Pinned Codex config-stack oracle output record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "upstream", "result"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "upstream": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codexCommit",
+        "configTree",
+        "execpolicyTree",
+        "coreExecPolicyBlob",
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "codexCommit": { "const": "086396f7f60347b74c82784d5dfaf4fb2d3bda12" },
+        "configTree": { "const": "d3f4925b575b128dd1f0f74a5babcdb1efce0219" },
+        "execpolicyTree": {
+          "const": "e06e0b4ad718af8a74055a33b1536b25fb9d4a87"
+        },
+        "coreExecPolicyBlob": {
+          "const": "5de05937533a2653a700b4ec40cda09578761f50"
+        },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 }
+      }
+    },
+    "result": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["stackError"],
+          "properties": {
+            "stackError": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "message"],
+              "properties": {
+                "kind": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stack",
+            "discoveredRuleFiles",
+            "requirements",
+            "policy"
+          ],
+          "properties": {
+            "stack": { "type": "object" },
+            "discoveredRuleFiles": { "type": "array" },
+            "requirements": { "type": "object" },
+            "policy": { "type": "object" }
+          }
+        }
+      ]
+    }
+  }
+}

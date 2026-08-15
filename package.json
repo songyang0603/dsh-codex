@@ -1,0 +1,43 @@
+{
+  "name": "dsh-codex",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Codex components rebuilt as DeepSeek Harness plugins under a fixed exact-parity standard",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/songyang0603/dsh-codex.git"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "packageManager": "pnpm@10.19.0",
+  "scripts": {
+    "build": "pnpm -r build",
+    "check": "pnpm format:check && pnpm upstream:verify && pnpm native:check && pnpm native:stage && pnpm typecheck && pnpm test && pnpm build && pnpm profile:check && pnpm pack:check",
+    "clean": "pnpm -r clean",
+    "conformance:execpolicy": "bash conformance/execpolicy/run.sh",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "native:build": "cargo build --locked --workspace",
+    "native:check": "pnpm native:fmt && pnpm native:lint && pnpm native:test && pnpm native:build",
+    "native:fmt": "cargo fmt --all -- --check",
+    "native:lint": "cargo clippy --locked --workspace --all-targets -- -D warnings",
+    "native:release-build": "cargo build --locked --release --package dsh-codex-execpolicy-engine",
+    "native:stage": "pnpm native:release-build && node scripts/stage-execpolicy-native.mjs",
+    "native:test": "cargo test --locked --workspace",
+    "pack:check": "pnpm -r --if-present pack:check",
+    "profile:check": "node scripts/test-execpolicy-profile.mjs",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "tsc -b --pretty false && pnpm -r --if-present typecheck:tests",
+    "upstream:verify": "node scripts/verify-upstream-pins.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh": "0.1.0-rc.6",
+    "@types/node": "^22.20.0",
+    "prettier": "^3.6.2",
+    "publint": "^0.3.21",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules/
+lib/
+target/
+Cargo.lock
+pnpm-lock.yaml
+
+# These are cryptographic conformance evidence, not formatter-owned sources.
+conformance/upstream-runtime/*.jsonl

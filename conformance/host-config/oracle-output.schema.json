@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/host-config/oracle-output.schema.json",
+  "title": "Pinned Codex host-config oracle JSONL record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "upstream", "result"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "upstream": { "$ref": "#/$defs/identity" },
+    "result": { "$ref": "#/$defs/result" }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "codexCommit",
+        "configTree",
+        "execServerTree",
+        "utilsCliTree",
+        "utilsHomeDirTree",
+        "execpolicyTree",
+        "coreExecPolicyBlob",
+        "coreCargoBlob",
+        "cargoLockBlob",
+        "configLoaderBlob",
+        "configStateBlob",
+        "execServerLibBlob",
+        "utilsCliLibBlob",
+        "utilsHomeDirLibBlob",
+        "os",
+        "arch"
+      ],
+      "properties": {
+        "codexCommit": { "const": "086396f7f60347b74c82784d5dfaf4fb2d3bda12" },
+        "configTree": { "const": "d3f4925b575b128dd1f0f74a5babcdb1efce0219" },
+        "execServerTree": {
+          "const": "51751785508060e633f0e0472fa0d2572787b36a"
+        },
+        "utilsCliTree": { "const": "5d9c72fcadefb9a1c95e38c4726d25c5b8d195ee" },
+        "utilsHomeDirTree": {
+          "const": "c2d10a4f4844c2a517584ee623a0b8aa4ceb44f5"
+        },
+        "execpolicyTree": {
+          "const": "e06e0b4ad718af8a74055a33b1536b25fb9d4a87"
+        },
+        "coreExecPolicyBlob": {
+          "const": "5de05937533a2653a700b4ec40cda09578761f50"
+        },
+        "coreCargoBlob": {
+          "const": "ff683fb5f921dcf23fe52ef52db6cf9889ca8efe"
+        },
+        "cargoLockBlob": {
+          "const": "a8c2addc02055be48c345b65760a7a1b96cfbf28"
+        },
+        "configLoaderBlob": {
+          "const": "244f7df02f1aba0eeb80fa8acebc7732195f8f3a"
+        },
+        "configStateBlob": {
+          "const": "bda2b7d1a73a22c0f39abbba0bad7f4a5e6932ea"
+        },
+        "execServerLibBlob": {
+          "const": "bfaec24cad2a27a91a7c685f3fead3138e2b01f7"
+        },
+        "utilsCliLibBlob": {
+          "const": "633638e72d65a931f68a503d523c76f75d0ac62b"
+        },
+        "utilsHomeDirLibBlob": {
+          "const": "caa43569c78bae9f5cc875092f378f4d935b8063"
+        },
+        "os": { "type": "string", "minLength": 1 },
+        "arch": { "type": "string", "minLength": 1 }
+      }
+    },
+    "result": {
+      "type": "object",
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "required": ["load", "evaluations"],
+          "properties": {
+            "load": { "type": "object" },
+            "evaluations": { "type": "array" }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["loadError"],
+          "properties": {
+            "loadError": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["stage", "kind", "message"],
+              "properties": {
+                "stage": { "enum": ["profile", "cli", "loader"] },
+                "kind": { "type": "string", "minLength": 1 },
+                "message": { "type": "string", "minLength": 1 }
+              }
+            }
+          }
+        },
+        {
+          "additionalProperties": false,
+          "required": ["skipped"],
+          "properties": {
+            "skipped": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["reason", "platform"],
+              "properties": {
+                "reason": { "const": "requires_unix_symlinks" },
+                "platform": { "const": "windows" }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

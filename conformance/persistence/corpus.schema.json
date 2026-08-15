@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/persistence/corpus.schema.json",
+  "title": "dsh-codex execpolicy persistence differential corpus record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "initial", "operations"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9][a-z0-9_-]*$"
+    },
+    "requiresUnix": { "type": "boolean", "default": false },
+    "initial": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["home"],
+      "properties": {
+        "home": { "enum": ["missing", "directory"] },
+        "policy": { "type": "string" },
+        "marker": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "content"],
+              "properties": {
+                "kind": { "const": "file" },
+                "content": { "type": "string" }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind"],
+              "properties": { "kind": { "const": "symlink_loop" } }
+            }
+          ]
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/operation" }
+    }
+  },
+  "$defs": {
+    "manager": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]*$"
+    },
+    "operation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "manager"],
+          "properties": {
+            "kind": { "const": "open" },
+            "manager": { "$ref": "#/$defs/manager" },
+            "ignoreUserAndProjectExecPolicyRules": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "manager", "prefix"],
+          "properties": {
+            "kind": { "const": "append_prefix" },
+            "manager": { "$ref": "#/$defs/manager" },
+            "prefix": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "manager", "host", "protocol", "decision"],
+          "properties": {
+            "kind": { "const": "append_network" },
+            "manager": { "$ref": "#/$defs/manager" },
+            "host": { "type": "string" },
+            "protocol": {
+              "enum": [
+                "http",
+                "https",
+                "https_connect",
+                "http-connect",
+                "socks5_tcp",
+                "socks5_udp"
+              ]
+            },
+            "decision": { "enum": ["allow", "prompt", "forbidden"] },
+            "justification": { "type": ["string", "null"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "manager"],
+          "properties": {
+            "kind": { "const": "inspect" },
+            "manager": { "$ref": "#/$defs/manager" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "source"],
+          "properties": {
+            "kind": { "enum": ["write_policy", "append_policy"] },
+            "source": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["remove_home", "replace_rules_dir_with_file"] }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,163 @@
+name: Pinned upstream conformance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  execpolicy:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            engine: target/debug/dsh-codex-execpolicy-engine
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            engine: target/debug/dsh-codex-execpolicy-engine
+          - name: macOS arm64
+            runner: macos-15
+            engine: target/debug/dsh-codex-execpolicy-engine
+          - name: macOS x64
+            runner: macos-15-intel
+            engine: target/debug/dsh-codex-execpolicy-engine
+          - name: Windows x64
+            runner: windows-2022
+            engine: target/debug/dsh-codex-execpolicy-engine.exe
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out dsh-codex
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check out pinned Codex sources
+        uses: actions/checkout@v4
+        with:
+          repository: openai/codex
+          ref: 086396f7f60347b74c82784d5dfaf4fb2d3bda12
+          path: .upstream/codex
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: codex-rs
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: upstream-conformance-${{ matrix.name }}
+
+      - name: Run pinned public exec-policy tests
+        working-directory: .upstream/codex/codex-rs
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: cargo test --locked -p codex-execpolicy -p codex-shell-command
+
+      - name: Run pinned codex-core exec-policy tests
+        working-directory: .upstream/codex/codex-rs
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: cargo test --locked -p codex-core --lib exec_policy
+
+      - name: Build current sidecar
+        run: cargo build --locked --workspace
+
+      - name: Prepare conformance outputs
+        run: mkdir -p .conformance-output
+
+      - name: Build and run the independent codex-core oracle
+        env:
+          CODEX_ORACLE_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: >-
+          bash conformance/upstream-runtime/run-oracle.sh
+          --codex-checkout .upstream/codex
+          --output .conformance-output/codex-runtime-oracle.jsonl
+
+      - name: Run current sidecar over the same corpus
+        run: >-
+          node conformance/upstream-runtime/run-candidate.mjs
+          --engine ${{ matrix.engine }}
+          --corpus conformance/upstream-runtime/corpus.jsonl
+          --output .conformance-output/dsh-codex-runtime-candidate.jsonl
+
+      - name: Compare canonical runtime outputs
+        run: >-
+          node conformance/upstream-runtime/compare.mjs
+          .conformance-output/codex-runtime-oracle.jsonl
+          .conformance-output/dsh-codex-runtime-candidate.jsonl
+
+      - name: Build and run the independent config-stack oracle
+        env:
+          CODEX_CONFIG_ORACLE_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: >-
+          bash conformance/config-stack/run-oracle.sh
+          --codex-checkout .upstream/codex
+          --output .conformance-output/codex-config-stack-oracle.jsonl
+
+      - name: Run current sidecar over the config-stack corpus
+        run: >-
+          node conformance/config-stack/run-candidate.mjs
+          --engine ${{ matrix.engine }}
+          --corpus conformance/config-stack/corpus.jsonl
+          --output .conformance-output/dsh-codex-config-stack-candidate.jsonl
+
+      - name: Compare canonical config-stack outputs
+        run: >-
+          node conformance/config-stack/compare.mjs
+          .conformance-output/codex-config-stack-oracle.jsonl
+          .conformance-output/dsh-codex-config-stack-candidate.jsonl
+
+      - name: Build and run the independent host-config oracle
+        env:
+          CODEX_HOST_CONFIG_ORACLE_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: >-
+          bash conformance/host-config/run-oracle.sh
+          --codex-checkout .upstream/codex
+          --output .conformance-output/codex-host-config-oracle.jsonl
+
+      - name: Run current sidecar over the host-config corpus
+        run: >-
+          node conformance/host-config/run-candidate.mjs
+          --engine ${{ matrix.engine }}
+          --corpus conformance/host-config/corpus.jsonl
+          --output .conformance-output/dsh-codex-host-config-candidate.jsonl
+
+      - name: Compare canonical host-config outputs
+        run: >-
+          node conformance/host-config/compare.mjs
+          .conformance-output/codex-host-config-oracle.jsonl
+          .conformance-output/dsh-codex-host-config-candidate.jsonl
+
+      - name: Build and run the independent persistence oracle
+        env:
+          CODEX_PERSISTENCE_ORACLE_TARGET_DIR: ${{ runner.temp }}/codex-core-oracle-target
+        run: >-
+          bash conformance/persistence/run-oracle.sh
+          --codex-checkout .upstream/codex
+          --output .conformance-output/codex-persistence-oracle.jsonl
+
+      - name: Run current sidecar over the persistence corpus
+        run: >-
+          node conformance/persistence/run-candidate.mjs
+          --engine ${{ matrix.engine }}
+          --corpus conformance/persistence/corpus.jsonl
+          --output .conformance-output/dsh-codex-persistence-candidate.jsonl
+
+      - name: Compare canonical persistence state machines
+        run: >-
+          node conformance/persistence/compare.mjs
+          conformance/persistence/corpus.jsonl
+          .conformance-output/codex-persistence-oracle.jsonl
+          .conformance-output/dsh-codex-persistence-candidate.jsonl

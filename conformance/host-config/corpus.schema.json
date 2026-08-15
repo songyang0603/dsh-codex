@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/host-config/corpus.schema.json",
+  "title": "Pinned Codex host-config conformance corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "codexHomeMode"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "codexHomeMode": { "enum": ["discover", "explicit"] },
+    "directories": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/safeRelativePath" },
+      "uniqueItems": true,
+      "default": []
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "contents"],
+        "properties": {
+          "path": { "$ref": "#/$defs/safeRelativePath" },
+          "contents": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "symlinks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "target"],
+        "properties": {
+          "path": { "$ref": "#/$defs/safeRelativePath" },
+          "target": { "$ref": "#/$defs/safeRelativePath" }
+        }
+      },
+      "default": []
+    },
+    "requiresUnixSymlinks": { "type": "boolean", "default": false },
+    "cwd": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/safeRelativePath" }],
+      "default": null
+    },
+    "cliOverrides": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": []
+    },
+    "strictConfig": { "type": "boolean", "default": false },
+    "profileV2": {
+      "oneOf": [{ "type": "null" }, { "type": "string" }],
+      "default": null
+    },
+    "ignoreUserConfig": { "type": "boolean", "default": false },
+    "ignoreUserAndProjectExecPolicyRules": {
+      "type": "boolean",
+      "default": false
+    },
+    "cloud": { "$ref": "#/$defs/cloudInput" },
+    "originKeys": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "default": []
+    },
+    "evaluations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["command", "fallback"],
+        "properties": {
+          "command": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "fallback": { "enum": ["allow", "prompt", "forbidden"] }
+        }
+      },
+      "default": []
+    },
+    "expectErrorStage": {
+      "oneOf": [{ "type": "null" }, { "enum": ["profile", "cli", "loader"] }],
+      "default": null
+    }
+  },
+  "$defs": {
+    "safeRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\u0000).+$"
+    },
+    "fragment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "contents"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "name": { "type": "string", "minLength": 1 },
+        "contents": { "type": "string" }
+      }
+    },
+    "bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["config_toml", "requirements_toml"],
+      "properties": {
+        "config_toml": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enterprise_managed"],
+          "properties": {
+            "enterprise_managed": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/fragment" }
+            }
+          }
+        },
+        "requirements_toml": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["enterprise_managed"],
+          "properties": {
+            "enterprise_managed": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/fragment" }
+            }
+          }
+        }
+      }
+    },
+    "cloudInput": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode"],
+          "properties": { "mode": { "const": "not_requested" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "bundle"],
+          "properties": {
+            "mode": { "const": "snapshot" },
+            "bundle": {
+              "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/bundle" }]
+            }
+          }
+        }
+      ],
+      "default": { "mode": "not_requested" }
+    }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/config-stack/corpus.schema.json",
+  "title": "Pinned Codex config-stack oracle corpus record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "layers"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "layers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/layer" }
+    },
+    "requirementsLayers": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/requirementsLayer" },
+      "default": []
+    },
+    "ignoreUserAndProjectExecPolicyRules": {
+      "type": "boolean",
+      "default": false
+    },
+    "originKeys": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "default": []
+    },
+    "evaluations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evaluation" },
+      "default": []
+    },
+    "expectStackError": { "type": "boolean", "default": false }
+  },
+  "$defs": {
+    "layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["system", "user", "project", "session_flags"] },
+        "config": { "type": "object", "default": {} },
+        "rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ruleFile" },
+          "default": []
+        },
+        "profile": { "type": ["string", "null"] },
+        "disabledReason": { "type": ["string", "null"] }
+      }
+    },
+    "ruleFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "source"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[^/\\\\]+\\.rules$" },
+        "source": { "type": "string" }
+      }
+    },
+    "requirementsLayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "toml"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["system", "enterprise_managed", "legacy_managed_file"]
+        },
+        "toml": { "type": "string" },
+        "name": { "type": ["string", "null"] }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "fallback"],
+      "properties": {
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "fallback": { "enum": ["allow", "prompt", "forbidden"] }
+      }
+    }
+  }
+}

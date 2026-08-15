@@ -1,0 +1,36 @@
+diff --git a/codex-rs/core/src/exec_policy.rs b/codex-rs/core/src/exec_policy.rs
+index 5de059375..66e659c30 100644
+--- a/codex-rs/core/src/exec_policy.rs
++++ b/codex-rs/core/src/exec_policy.rs
+@@ -1151,3 +1151,7 @@ async fn collect_policy_files(dir: &Path) -> Result<Vec<PathBuf>, ExecPolicyErro
+ #[cfg(test)]
+ #[path = "exec_policy_tests.rs"]
+ mod tests;
++
++#[cfg(test)]
++#[path = "exec_policy_host_config_oracle.rs"]
++mod dsh_codex_host_config_oracle;
+diff --git a/codex-rs/core/Cargo.toml b/codex-rs/core/Cargo.toml
+index ff683fb5f..e89714c6c 100644
+--- a/codex-rs/core/Cargo.toml
++++ b/codex-rs/core/Cargo.toml
+@@ -75,6 +75,7 @@ codex-utils-audio = { workspace = true }
+ codex-utils-cache = { workspace = true }
+ codex-utils-image = { workspace = true }
+ codex-utils-home-dir = { workspace = true }
++codex-utils-cli = { workspace = true }
+ codex-utils-output-truncation = { workspace = true }
+ codex-utils-path = { workspace = true }
+ codex-utils-path-uri = { workspace = true }
+diff --git a/codex-rs/Cargo.lock b/codex-rs/Cargo.lock
+index a8c2addc02..393a0566a1 100644
+--- a/codex-rs/Cargo.lock
++++ b/codex-rs/Cargo.lock
+@@ -2784,6 +2784,7 @@ dependencies = [
+  "codex-utils-audio",
+  "codex-utils-cache",
+  "codex-utils-cargo-bin",
++ "codex-utils-cli",
+  "codex-utils-home-dir",
+  "codex-utils-image",
+  "codex-utils-output-truncation",
