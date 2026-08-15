@@ -205,7 +205,7 @@ jobs:
           sparse-checkout: codex-rs
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.19.0
           run_install: false
