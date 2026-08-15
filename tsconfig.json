@@ -2,6 +2,7 @@
   "files": [],
   "references": [
     { "path": "./packages/execpolicy" },
-    { "path": "./packages/approval" }
+    { "path": "./packages/approval" },
+    { "path": "./packages/apply-patch-engine" }
   ]
 }

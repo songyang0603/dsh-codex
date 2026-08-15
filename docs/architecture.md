@@ -7,6 +7,8 @@ flowchart LR
   EP --> IPC["protocol-v3 JSONL sidecar"]
   IPC --> Rust["pinned Codex crates + adapted private runtime"]
   EP --> Approval["approval component"]
+  DSH --> PatchEngine["apply-patch semantic service"]
+  PatchEngine --> PatchNative["pinned codex-apply-patch sidecar"]
   EP --> Shell["shell component"]
   Shell --> Sandbox["sandbox component"]
   Shell --> Network["network component"]
@@ -20,13 +22,14 @@ flowchart LR
 The repository does not divide Codex by convenient source-file size. A
 component owns a state machine or observable side effect:
 
-| Component  | Owns                                                                                     | Does not own                                   |
-| ---------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| Execpolicy | config/rule loading, policy evaluation, approval requirement, canonical rule persistence | prompt UI, process launch, sandbox, live proxy |
-| Approval   | rich decision wire, prompt correlation, cancellation, live-session grant cache           | policy parsing, command launch, proxy          |
-| Shell      | canonical argv/cwd/env, exact approval keys, process/PTY lifecycle, retry choreography   | policy syntax, UI rendering                    |
-| Sandbox    | platform enforcement and denial reporting                                                | policy-file persistence, prompt correlation    |
-| Network    | managed proxy, host approval cache/coalescing, live mutation and actual-effect result    | generic command cache, prefix parser           |
+| Component          | Owns                                                                                     | Does not own                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Execpolicy         | config/rule loading, policy evaluation, approval requirement, canonical rule persistence | prompt UI, process launch, sandbox, live proxy                      |
+| Approval           | rich decision wire, prompt correlation, cancellation, live-session grant cache           | policy parsing, command launch, proxy                               |
+| Apply patch engine | parser, verification, local mutation, raw output and ordered committed delta             | model tool schema, approval, sandbox retry, hooks, events, TurnDiff |
+| Shell              | canonical argv/cwd/env, exact approval keys, process/PTY lifecycle, retry choreography   | policy syntax, UI rendering                                         |
+| Sandbox            | platform enforcement and denial reporting                                                | policy-file persistence, prompt correlation                         |
+| Network            | managed proxy, host approval cache/coalescing, live mutation and actual-effect result    | generic command cache, prefix parser                                |
 
 This prevents a field from being mistaken for an effect. Execpolicy can return
 `bypassSandbox: true`; only the shell/sandbox composition can prove that the

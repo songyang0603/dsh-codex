@@ -73,10 +73,14 @@ function parseArgs(argv) {
   if (!new Set(["arm64", "x64"]).has(options.arch)) {
     throw new Error(`unsupported Node architecture: ${options.arch}`);
   }
-  options.binary = resolve(
-    repositoryRoot,
-    options.binary ?? `target/release/${executableName(options.platform)}`,
-  );
+  options.binary =
+    options.binary === undefined
+      ? resolve(
+          process.env.CARGO_TARGET_DIR ?? resolve(repositoryRoot, "target"),
+          "release",
+          executableName(options.platform),
+        )
+      : resolve(repositoryRoot, options.binary);
   return options;
 }
 

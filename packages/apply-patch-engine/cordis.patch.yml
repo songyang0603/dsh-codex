@@ -1,0 +1,6 @@
+# Install only the pinned apply-patch semantic and filesystem-effect service.
+# A model-visible freeform tool, approval, sandboxing, hooks, TurnDiff, and UI
+# remain separate dsh-codex components.
+- insert:
+    - id: dsh-codex-apply-patch-engine
+      name: "@songyang0603/dsh-codex-apply-patch-engine"

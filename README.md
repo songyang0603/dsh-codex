@@ -12,10 +12,11 @@ component boundary, but behavior inside that boundary may not be weakened.
 
 ## Components
 
-| Package                              | Responsibility                                                                                                           | Status                                           |
-| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `@songyang0603/dsh-codex-execpolicy` | policy/config loading, command classification, approval-requirement derivation, canonical migration and rule persistence | `0.1.0`; `parity_verified` on macOS arm64 source |
-| `@songyang0603/dsh-codex-approval`   | lossless rich approval wire, pending correlation and live-session cache                                                  | `0.1.0`; `parity_verified` on macOS arm64 source |
+| Package                                      | Responsibility                                                                                                           | Status                                           |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `@songyang0603/dsh-codex-execpolicy`         | policy/config loading, command classification, approval-requirement derivation, canonical migration and rule persistence | `0.1.0`; `parity_verified` on macOS arm64 source |
+| `@songyang0603/dsh-codex-approval`           | lossless rich approval wire, pending correlation and live-session cache                                                  | `0.1.0`; `parity_verified` on macOS arm64 source |
+| `@songyang0603/dsh-codex-apply-patch-engine` | parsing, invocation recognition, verification, local mutation, and committed delta                                       | `0.1.0`; `parity_verified` on macOS arm64 source |
 
 `execpolicy` deliberately does not export a generic DSH `bash` enforcement
 adapter. Stock DSH Bash cannot apply Codex `bypassSandbox`, managed-network,
@@ -94,6 +95,24 @@ Linux, macOS, and Windows CI matrix becomes platform evidence only after it has
 actually run. Exact commands, hashes, failures, and exclusions are recorded
 under `conformance/*/STATUS.md`.
 
+## Apply-patch engine evidence
+
+The `0.1.0` macOS arm64 semantic-engine tuple is `parity_verified`. The native
+sidecar directly links the pinned public `codex-apply-patch` implementation;
+all 96 upstream library/CLI/scenario tests pass. An independent 23-case oracle
+then compares the production TypeScript client and native protocol against the
+pinned public APIs, including parse/stream/invocation errors, raw output,
+ordered committed deltas, partial failure, exact file bytes, Unix modes, and
+no-follow symlink effects: `23/23` matched. The component also passes 10 native
+tests, 6 TypeScript/native/real-Loader tests, and a clean DSH rc.6 archived
+package add/activate/mutate/remove check using only the packaged native binary.
+
+This claim is intentionally the semantic/filesystem engine only. Installing it
+does not register an `apply_patch` model tool. Codex's freeform provider wire,
+environment selection, safety, rich approval, platform sandbox/retry,
+hooks/events, TurnDiff, agent/session behavior, and Linux/Windows execution are
+separate unfinished boundaries.
+
 ## Use from a source checkout
 
 Requirements: Node.js 22.19+, pnpm 10.19, and Rust 1.95.0.
@@ -103,6 +122,7 @@ pnpm install
 pnpm native:stage
 pnpm --filter @songyang0603/dsh-codex-execpolicy build
 pnpm --filter @songyang0603/dsh-codex-approval build
+pnpm --filter @songyang0603/dsh-codex-apply-patch-engine build
 ```
 
 `native:stage` builds the current-platform Rust sidecar, verifies its protocol
@@ -116,6 +136,7 @@ installed:
 ```sh
 dsh plugin --profile codex-dev add ./packages/execpolicy
 dsh plugin --profile codex-approval-dev add ./packages/approval
+dsh plugin --profile codex-apply-patch-dev add ./packages/apply-patch-engine
 dsh --profile codex-dev --dump-config
 ```
 
@@ -130,7 +151,9 @@ native-binary release is claimed.
 
 For API examples and configuration modes, see
 [packages/execpolicy/README.md](packages/execpolicy/README.md) and
-[packages/approval/README.md](packages/approval/README.md).
+[packages/approval/README.md](packages/approval/README.md). The semantic engine
+API and its deliberate non-tool boundary are documented in
+[packages/apply-patch-engine/README.md](packages/apply-patch-engine/README.md).
 
 ## Repository layout
 

@@ -11,10 +11,11 @@
 
 目前的组件：
 
-| 包                                   | 职责                                                                                      | 状态                                            |
-| ------------------------------------ | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `@songyang0603/dsh-codex-execpolicy` | policy/config 装载、命令分类、approval requirement 推导、canonical migration 与规则持久化 | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
-| `@songyang0603/dsh-codex-approval`   | 无损 rich approval 协议、pending correlation 与 live-session cache                        | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
+| 包                                           | 职责                                                                                      | 状态                                            |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `@songyang0603/dsh-codex-execpolicy`         | policy/config 装载、命令分类、approval requirement 推导、canonical migration 与规则持久化 | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
+| `@songyang0603/dsh-codex-approval`           | 无损 rich approval 协议、pending correlation 与 live-session cache                        | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
+| `@songyang0603/dsh-codex-apply-patch-engine` | 解析、调用识别、校验、本地变更与 committed delta                                          | `0.1.0`；macOS arm64 源码组件 `parity_verified` |
 
 `execpolicy` 不再公开一个近似的通用 DSH `bash` enforcement。原因是 stock DSH Bash 无法精确消费 Codex 的 `bypassSandbox`、managed network、rich approval 和 retry 语义，还可能产生第二次审批。后续由独立的 `approval`、`shell`、`sandbox`、`network` 组件精确串接；这属于组件拆分，不是降低最终目标。
 
@@ -51,6 +52,12 @@ Rust engine 直接依赖固定 revision 的 Codex 公共 crates；必须适配�
 
 这些是有明确语料和平台边界的本地证据，不代表完整 coding agent 已经完成。Linux、macOS、Windows 的 CI 配置只有真正跑过以后才算对应平台证据。命令、哈希、曾经失败的尝试和未覆盖范围都记录在 `conformance/*/STATUS.md`。
 
+## apply-patch engine 当前证据
+
+`0.1.0` 的 macOS arm64 语义引擎已经达到 `parity_verified`。native sidecar 直接链接固定 revision 的 `codex-apply-patch` 公共实现，上游 96 个 library/CLI/scenario 测试全部通过；独立 23-case oracle 再从生产 TypeScript client 经真实 native 协议，对照固定上游 API，覆盖 parse/stream/invocation 错误、原始 stdout/stderr、有序 committed delta、部分失败、精确文件字节、Unix mode 和不跟随 symlink 的效果，结果 `23/23` 一致。组件另外通过 10 个 native 测试、6 个 TypeScript/native/真实 Loader 测试，以及全新 DSH rc.6 profile 中仅依赖归档内 native 的 add/activate/mutate/remove 检查。
+
+该完成声明只属于语义/文件系统引擎。安装它不会注册模型可见的 `apply_patch` 工具。Codex 的 freeform provider wire、环境选择、safety、rich approval、平台 sandbox/retry、hooks/events、TurnDiff、agent/session 行为，以及尚未实跑的 Linux/Windows 都是独立的未完成边界。
+
 ## 从源码使用
 
 需要 Node.js 22.19+、pnpm 10.19 和 Rust 1.95.0。
@@ -60,6 +67,7 @@ pnpm install
 pnpm native:stage
 pnpm --filter @songyang0603/dsh-codex-execpolicy build
 pnpm --filter @songyang0603/dsh-codex-approval build
+pnpm --filter @songyang0603/dsh-codex-apply-patch-engine build
 ```
 
 `native:stage` 会编译当前平台 sidecar，核对 protocol 与全部上游身份，再把二进制和 SHA-256 暂存到组件自己的 native 目录。生成的二进制不会进入 Git。
@@ -69,6 +77,7 @@ pnpm --filter @songyang0603/dsh-codex-approval build
 ```sh
 dsh plugin --profile codex-dev add ./packages/execpolicy
 dsh plugin --profile codex-approval-dev add ./packages/approval
+dsh plugin --profile codex-apply-patch-dev add ./packages/apply-patch-engine
 dsh --profile codex-dev --dump-config
 ```
 
@@ -76,7 +85,7 @@ dsh --profile codex-dev --dump-config
 
 首个版本只发布源码；目前不宣称已经发布 npm 包或 GitHub native binary。
 
-API 与配置示例见 [packages/execpolicy/README.md](packages/execpolicy/README.md) 和 [packages/approval/README.md](packages/approval/README.md)。
+API 与配置示例见 [packages/execpolicy/README.md](packages/execpolicy/README.md)、[packages/approval/README.md](packages/approval/README.md) 和 [packages/apply-patch-engine/README.md](packages/apply-patch-engine/README.md)。
 
 ## 文件组织
 

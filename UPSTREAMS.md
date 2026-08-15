@@ -36,6 +36,15 @@ session handlers, network approval state, and app-server bridge. Its
 independent oracle compiles the pinned core behavior with test-only
 instrumentation; package-local tests are not used as the upstream oracle.
 
+The apply-patch semantic engine directly links the pinned public
+`codex-apply-patch`, `codex-exec-server`, and `codex-utils-path-uri` crates. Its
+runtime handshake pins the apply-patch tree and the parser, streaming parser,
+invocation, file-update, text-file, seek-sequence, and Cargo-lock objects. The
+complete pinned public test suite and an independent production-path
+filesystem differential cover this boundary. Codex's private model-tool,
+safety, approval, sandbox, hook/event, and TurnDiff integration remains outside
+this component and is not inferred from semantic-engine parity.
+
 Apache-2.0 reuse requires the upstream license and notices to accompany
 redistribution. Modified/adapted source carries prominent notices. A future
 component must add its own exact paths and applicable third-party attribution;
@@ -78,3 +87,8 @@ The execpolicy package itself now depends only on Cordis and Schemastery at
 runtime and Loader for its built-artifact test. It does not depend on
 `dsh-tools` or the stock one-shot approval seam because it intentionally
 exports no approximate Bash enforcement adapter.
+
+The apply-patch engine package likewise exposes a Cordis semantic service, not
+a DSH model tool. The audited DSH tool-schema objects are pinned specifically
+to preserve the finding that rc.6 cannot express Codex's freeform custom-tool
+wire through its JSON-Schema function-tool surface.

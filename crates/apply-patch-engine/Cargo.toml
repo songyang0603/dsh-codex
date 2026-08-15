@@ -1,0 +1,23 @@
+[package]
+name = "dsh-codex-apply-patch-engine"
+description = "Pinned Codex apply_patch semantic engine sidecar for DeepSeek Harness"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+codex-apply-patch = { git = "https://github.com/openai/codex", rev = "086396f7f60347b74c82784d5dfaf4fb2d3bda12" }
+codex-exec-server = { git = "https://github.com/openai/codex", rev = "086396f7f60347b74c82784d5dfaf4fb2d3bda12" }
+codex-utils-path-uri = { git = "https://github.com/openai/codex", rev = "086396f7f60347b74c82784d5dfaf4fb2d3bda12" }
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+
+[lints.rust]
+unsafe_code = "forbid"

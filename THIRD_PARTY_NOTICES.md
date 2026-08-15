@@ -10,8 +10,9 @@ the exact source boundaries and object identities.
 The current copied/adapted behavior concerns execpolicy runtime, configuration,
 and persistence. The approval protocol sidecar directly links the pinned
 public Codex app-server protocol crate; its DSH lifecycle/state adapter is
-independently written. Modified Rust source carries prominent change notices.
-Direct Git dependencies remain upstream code.
+independently written. The apply-patch semantic sidecar directly links the
+pinned public apply-patch/filesystem implementation. Modified Rust source
+carries prominent change notices. Direct Git dependencies remain upstream code.
 
 Upstream Codex carries additional notices, including MIT-licensed
 Ratatui-derived code. This repository does not currently copy that UI code. If

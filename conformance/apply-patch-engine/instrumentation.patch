@@ -1,0 +1,34 @@
+diff --git a/codex-rs/apply-patch/Cargo.toml b/codex-rs/apply-patch/Cargo.toml
+index 8e1d7f651..7d627a36c 100644
+--- a/codex-rs/apply-patch/Cargo.toml
++++ b/codex-rs/apply-patch/Cargo.toml
+@@ -32,4 +32,5 @@ assert_cmd = { workspace = true }
+ assert_matches = { workspace = true }
+ codex-utils-cargo-bin = { workspace = true }
+ pretty_assertions = { workspace = true }
++serde_json = { workspace = true }
+ tempfile = { workspace = true }
+diff --git a/codex-rs/apply-patch/src/lib.rs b/codex-rs/apply-patch/src/lib.rs
+index 5b5fac068..13b5e030d 100644
+--- a/codex-rs/apply-patch/src/lib.rs
++++ b/codex-rs/apply-patch/src/lib.rs
+@@ -1349,3 +1349,7 @@ mod tests {
+         assert!(!delta.is_exact());
+     }
+ }
++
++#[cfg(test)]
++#[path = "apply_patch_engine_conformance_oracle.rs"]
++mod dsh_codex_apply_patch_engine_conformance_oracle;
+diff --git a/codex-rs/Cargo.lock b/codex-rs/Cargo.lock
+index a8c2addc0..0cf9faf95 100644
+--- a/codex-rs/Cargo.lock
++++ b/codex-rs/Cargo.lock
+@@ -2243,6 +2243,7 @@ dependencies = [
+  "codex-utils-cargo-bin",
+  "codex-utils-path-uri",
+  "pretty_assertions",
++ "serde_json",
+  "similar",
+  "tempfile",
+  "thiserror 2.0.18",

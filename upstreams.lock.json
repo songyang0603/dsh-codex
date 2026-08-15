@@ -121,6 +121,71 @@
           "path": "codex-rs/app-server/src/bespoke_event_handling.rs",
           "gitObjectType": "blob",
           "gitObject": "32c222668614aa17b8496712c24b061d76bcc2b5"
+        },
+        "applyPatch": {
+          "path": "codex-rs/apply-patch",
+          "gitObjectType": "tree",
+          "gitObject": "1601c43435739cfeca8c5ae4fe28e56b5efc4246"
+        },
+        "applyPatchLib": {
+          "path": "codex-rs/apply-patch/src/lib.rs",
+          "gitObjectType": "blob",
+          "gitObject": "5b5fac0683288b0e008ebf753dee0d588f625b77"
+        },
+        "applyPatchParser": {
+          "path": "codex-rs/apply-patch/src/parser.rs",
+          "gitObjectType": "blob",
+          "gitObject": "c400d075a684fda29c10269aef1958a27faf90aa"
+        },
+        "applyPatchStreamingParser": {
+          "path": "codex-rs/apply-patch/src/streaming_parser.rs",
+          "gitObjectType": "blob",
+          "gitObject": "ff1b2f82feec7bdf454f6cba61ad5f15611f5573"
+        },
+        "applyPatchInvocation": {
+          "path": "codex-rs/apply-patch/src/invocation.rs",
+          "gitObjectType": "blob",
+          "gitObject": "41ee8b539aa0c2be321e1e839a503ee4760393a7"
+        },
+        "applyPatchFileUpdate": {
+          "path": "codex-rs/apply-patch/src/file_update.rs",
+          "gitObjectType": "blob",
+          "gitObject": "d700570264f2b72f356011064028dededa4a2a55"
+        },
+        "applyPatchTextFile": {
+          "path": "codex-rs/apply-patch/src/text_file.rs",
+          "gitObjectType": "blob",
+          "gitObject": "b7d598ca973ec73f0ed064d2360f4d218e2a792d"
+        },
+        "applyPatchSeekSequence": {
+          "path": "codex-rs/apply-patch/src/seek_sequence.rs",
+          "gitObjectType": "blob",
+          "gitObject": "9934fa55e767cacf85db7e459a913e72c9d828a0"
+        },
+        "applyPatchFileSystem": {
+          "path": "codex-rs/file-system",
+          "gitObjectType": "tree",
+          "gitObject": "971c42b87f1e8e94411d6b63a854b1404df45d1d"
+        },
+        "applyPatchPathUri": {
+          "path": "codex-rs/utils/path-uri",
+          "gitObjectType": "tree",
+          "gitObject": "02fceb44b126b04efe3d4d2087284d092fa02f13"
+        },
+        "applyPatchCoreHandler": {
+          "path": "codex-rs/core/src/tools/handlers/apply_patch.rs",
+          "gitObjectType": "blob",
+          "gitObject": "36ae51ba7b9022350cd5a362464b63655ead6b84"
+        },
+        "applyPatchCoreSpec": {
+          "path": "codex-rs/core/src/tools/handlers/apply_patch_spec.rs",
+          "gitObjectType": "blob",
+          "gitObject": "39956d208fa798d2ae5d9162482789fd8cd37f48"
+        },
+        "applyPatchGrammar": {
+          "path": "codex-rs/core/src/tools/handlers/apply_patch.lark",
+          "gitObjectType": "blob",
+          "gitObject": "5aa41b0af797a0bde0dc2459c272c9af63e96dc3"
         }
       }
     },
@@ -203,6 +268,16 @@
           "gitObjectType": "tree",
           "gitObject": "2fef8ef72b09ae6a2abbd0a1bd0ce82e1fb5cb80",
           "packageVersion": "0.1.0-rc.5"
+        },
+        "toolSchema": {
+          "path": "packages/llm/llm/src/types.ts",
+          "gitObjectType": "blob",
+          "gitObject": "326db1cb1473cb435ec98425c2df359977eba4fa"
+        },
+        "toolRegistry": {
+          "path": "packages/core/tools/src/index.ts",
+          "gitObjectType": "blob",
+          "gitObject": "377015feb3c329207f540046beadb08208b6c920"
         }
       }
     }

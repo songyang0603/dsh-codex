@@ -16,3 +16,4 @@ target/
 .upstream-worktrees/
 packages/execpolicy/native/
 packages/approval/native/
+packages/apply-patch-engine/native/

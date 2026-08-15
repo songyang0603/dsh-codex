@@ -98,10 +98,15 @@ verifyUpstream("codex", codex, codexCheckout);
 verifyUpstream("deepseekHarness", deepseekHarness, deepseekHarnessCheckout);
 
 const cargoManifests = new Map(
-  ["execpolicy-engine", "approval-protocol-engine"].map((crate) => [
-    crate,
-    readFileSync(resolve(repositoryRoot, `crates/${crate}/Cargo.toml`), "utf8"),
-  ]),
+  ["execpolicy-engine", "approval-protocol-engine", "apply-patch-engine"].map(
+    (crate) => [
+      crate,
+      readFileSync(
+        resolve(repositoryRoot, `crates/${crate}/Cargo.toml`),
+        "utf8",
+      ),
+    ],
+  ),
 );
 const cargoLock = readFileSync(resolve(repositoryRoot, "Cargo.lock"), "utf8");
 const directGitDependencies = [
@@ -118,6 +123,9 @@ const directGitDependencies = [
     crate: "approval-protocol-engine",
     dependency: "codex-app-server-protocol",
   },
+  ...["codex-apply-patch", "codex-exec-server", "codex-utils-path-uri"].map(
+    (dependency) => ({ crate: "apply-patch-engine", dependency }),
+  ),
 ];
 for (const { crate, dependency } of directGitDependencies) {
   const cargoManifest = cargoManifests.get(crate);
@@ -245,6 +253,15 @@ const packageManifests = [
     JSON.parse(
       readFileSync(
         resolve(repositoryRoot, "packages/approval/package.json"),
+        "utf8",
+      ),
+    ),
+  ],
+  [
+    "apply-patch-engine",
+    JSON.parse(
+      readFileSync(
+        resolve(repositoryRoot, "packages/apply-patch-engine/package.json"),
         "utf8",
       ),
     ),

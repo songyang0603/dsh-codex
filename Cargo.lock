@@ -1024,6 +1024,22 @@ version = "0.0.0"
 source = "git+https://github.com/openai/codex?rev=086396f7f60347b74c82784d5dfaf4fb2d3bda12#086396f7f60347b74c82784d5dfaf4fb2d3bda12"
 
 [[package]]
+name = "codex-apply-patch"
+version = "0.0.0"
+source = "git+https://github.com/openai/codex?rev=086396f7f60347b74c82784d5dfaf4fb2d3bda12#086396f7f60347b74c82784d5dfaf4fb2d3bda12"
+dependencies = [
+ "anyhow",
+ "codex-exec-server",
+ "codex-utils-absolute-path",
+ "codex-utils-path-uri",
+ "similar",
+ "thiserror 2.0.18",
+ "tokio",
+ "tree-sitter",
+ "tree-sitter-bash",
+]
+
+[[package]]
 name = "codex-async-utils"
 version = "0.0.0"
 source = "git+https://github.com/openai/codex?rev=086396f7f60347b74c82784d5dfaf4fb2d3bda12#086396f7f60347b74c82784d5dfaf4fb2d3bda12"
@@ -2315,6 +2331,19 @@ name = "downcast-rs"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75b325c5dbd37f80359721ad39aca5a29fb04c89279657cffdda8736d0c0b9d2"
+
+[[package]]
+name = "dsh-codex-apply-patch-engine"
+version = "0.1.0"
+dependencies = [
+ "codex-apply-patch",
+ "codex-exec-server",
+ "codex-utils-path-uri",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "tokio",
+]
 
 [[package]]
 name = "dsh-codex-approval-protocol-engine"

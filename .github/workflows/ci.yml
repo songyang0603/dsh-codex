@@ -38,10 +38,15 @@ jobs:
           fetch-depth: 1
           sparse-checkout: |
             codex-rs/Cargo.lock
+            codex-rs/apply-patch
             codex-rs/config
             codex-rs/exec-server
             codex-rs/execpolicy
+            codex-rs/file-system
             codex-rs/shell-command
+            codex-rs/core/src/tools/handlers/apply_patch.rs
+            codex-rs/core/src/tools/handlers/apply_patch_spec.rs
+            codex-rs/core/src/tools/handlers/apply_patch.lark
             codex-rs/core/src/exec_policy.rs
             codex-rs/core/src/exec_policy
             codex-rs/core/src/session/handlers.rs
@@ -58,6 +63,7 @@ jobs:
             codex-rs/app-server/src/bespoke_event_handling.rs
             codex-rs/utils/cli
             codex-rs/utils/home-dir
+            codex-rs/utils/path-uri
 
       - name: Check out pinned DeepSeek Harness sources
         uses: actions/checkout@v4
@@ -75,6 +81,8 @@ jobs:
             vendor/schemastery
             packages/boot/app-boot
             packages/interaction/user-approval
+            packages/llm/llm/src/types.ts
+            packages/core/tools/src/index.ts
 
       - name: Verify source objects and dependency revisions
         run: >-
@@ -107,6 +115,11 @@ jobs:
           git -C .upstream/codex apply --check
           "$GITHUB_WORKSPACE/conformance/approval/instrumentation.patch"
 
+      - name: Verify apply-patch engine oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/apply-patch-engine/instrumentation.patch"
+
   component:
     name: ${{ matrix.name }}
     strategy:
@@ -119,30 +132,35 @@ jobs:
             package: true
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: Linux arm64
             runner: ubuntu-24.04-arm
             lint: false
             package: false
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: macOS arm64
             runner: macos-15
             lint: false
             package: false
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: macOS x64
             runner: macos-15-intel
             lint: false
             package: false
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: Windows x64
             runner: windows-2022
             lint: false
             package: false
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine.exe
             approval_engine: target/release/dsh-codex-approval-protocol-engine.exe
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine.exe
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:
@@ -199,6 +217,9 @@ jobs:
 
       - name: Verify and stage the approval native sidecar
         run: node scripts/stage-approval-native.mjs --binary ${{ matrix.approval_engine }}
+
+      - name: Verify and stage the apply-patch native sidecar
+        run: node scripts/stage-apply-patch-engine-native.mjs --binary ${{ matrix.apply_patch_engine }}
 
       - name: Check TypeScript types
         run: pnpm typecheck

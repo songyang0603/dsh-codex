@@ -161,3 +161,91 @@ jobs:
           conformance/persistence/corpus.jsonl
           .conformance-output/codex-persistence-oracle.jsonl
           .conformance-output/dsh-codex-persistence-candidate.jsonl
+
+  apply-patch-engine:
+    name: Apply patch / ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            runner: ubuntu-24.04
+            engine: target/debug/dsh-codex-apply-patch-engine
+          - name: Linux arm64
+            runner: ubuntu-24.04-arm
+            engine: target/debug/dsh-codex-apply-patch-engine
+          - name: macOS arm64
+            runner: macos-15
+            engine: target/debug/dsh-codex-apply-patch-engine
+          - name: macOS x64
+            runner: macos-15-intel
+            engine: target/debug/dsh-codex-apply-patch-engine
+          - name: Windows x64
+            runner: windows-2022
+            engine: target/debug/dsh-codex-apply-patch-engine.exe
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out dsh-codex
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check out pinned Codex sources
+        uses: actions/checkout@v4
+        with:
+          repository: openai/codex
+          ref: 086396f7f60347b74c82784d5dfaf4fb2d3bda12
+          path: .upstream/codex
+          persist-credentials: false
+          fetch-depth: 1
+          sparse-checkout: codex-rs
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.19.0
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.20.0
+          cache: pnpm
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.95.0
+
+      - name: Cache Rust builds
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: apply-patch-upstream-conformance-${{ matrix.name }}
+
+      - name: Install JavaScript dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run all pinned public apply-patch tests
+        working-directory: .upstream/codex/codex-rs
+        env:
+          CARGO_TARGET_DIR: ${{ runner.temp }}/codex-apply-patch-oracle-target
+        run: cargo test --locked -p codex-apply-patch
+
+      - name: Build the current native engine and package client
+        run: |
+          cargo build --locked -p dsh-codex-apply-patch-engine
+          pnpm --filter @songyang0603/dsh-codex-apply-patch-engine build
+
+      - name: Run the independent same-platform differential
+        env:
+          CODEX_APPLY_PATCH_ENGINE_TARGET_DIR: ${{ runner.temp }}/codex-apply-patch-oracle-target
+        run: >-
+          bash conformance/apply-patch-engine/run.sh
+          --codex-checkout .upstream/codex
+          --engine ${{ matrix.engine }}
+          --package-dir packages/apply-patch-engine
+          --artifacts-dir ${{ runner.temp }}/dsh-codex-apply-patch-conformance

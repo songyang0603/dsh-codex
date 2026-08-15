@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/apply-patch-engine/corpus.schema.json",
+  "title": "Codex apply-patch semantic engine differential corpus",
+  "type": "object",
+  "required": ["schemaVersion", "id", "operation"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "operation": {
+      "enum": ["parse", "stream", "invocation", "verify", "apply"]
+    },
+    "patch": { "type": "string" },
+    "chunks": { "type": "array", "items": { "type": "string" } },
+    "argv": { "type": "array", "items": { "type": "string" } },
+    "mode": { "enum": ["normalizeToLf", "preserveLineEndings"] },
+    "requiresUnix": { "type": "boolean" },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": ["path", "kind"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "kind": { "const": "directory" },
+              "mode": { "type": "string", "pattern": "^[0-7]{4}$" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["path", "kind", "bytesHex"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "kind": { "const": "file" },
+              "bytesHex": {
+                "type": "string",
+                "pattern": "^(?:[0-9a-fA-F]{2})*$"
+              },
+              "mode": { "type": "string", "pattern": "^[0-7]{4}$" }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "required": ["path", "kind", "target"],
+            "properties": {
+              "path": { "type": "string", "minLength": 1 },
+              "kind": { "const": "symlink" },
+              "target": { "type": "string", "minLength": 1 }
+            },
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "operation": { "const": "stream" } } },
+      "then": { "required": ["chunks"] },
+      "else": {
+        "if": { "properties": { "operation": { "const": "invocation" } } },
+        "then": { "required": ["argv"] },
+        "else": { "required": ["patch"] }
+      }
+    }
+  ],
+  "additionalProperties": false
+}
