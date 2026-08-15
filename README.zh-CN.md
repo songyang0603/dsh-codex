@@ -10,7 +10,7 @@
 
 仓库仍在持续开发。目前有三个基础组件通过验证；只安装它们还**不能**得到完整 Codex agent。
 
-## 为什么做 dsh-codex？
+## 💡 为什么做 dsh-codex？
 
 DeepSeek Harness 以可组合插件为核心。`dsh-codex` 利用这种架构，把 Codex 子系统变成拥有明确状态、生命周期、安装方式和 conformance 边界的 DSH 服务。
 
@@ -22,7 +22,7 @@ DeepSeek Harness 以可组合插件为核心。`dsh-codex` 利用这种架构，
 - 把每个已完成边界与固定上游实现逐项比较；
 - 最终构建 DSH 原生 coding agent，而不是原生 Codex 二进制的桥接器。
 
-## 已完成组件
+## 🧩 已完成组件
 
 | 组件                                                                        | 提供的能力                                                                      | 状态                                         |
 | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------- | -------------------------------------------- |
@@ -32,7 +32,7 @@ DeepSeek Harness 以可组合插件为核心。`dsh-codex` 利用这种架构，
 
 Codex 的完整拆分见[组件地图](docs/components.md)，`parity_verified` 的完成标准见[精确性标准](docs/parity-standard.md)。
 
-## 快速开始
+## 🚀 快速开始
 
 需要 Node.js 22.19+、pnpm 10.19、Rust 1.95.0 和 DeepSeek Harness `0.1.0-rc.6`。
 
@@ -65,7 +65,7 @@ ctx.codexApplyPatch
 
 目前组件只从源码使用；尚未宣称发布 npm 包或 GitHub native binary。
 
-## 工作方式
+## ⚙️ 工作方式
 
 ```text
 固定 Codex 源码
@@ -87,7 +87,7 @@ ctx.codexApplyPatch
 
 每个可安装包都有自己的 `dsh.bundle.patch`、profile row、编译入口、说明、许可声明和精确 peer。仓库根目录是组件 workspace，不是一个可安装的全家桶 bundle。
 
-## 当前精确性证据
+## ✅ 当前精确性证据
 
 | 边界                 | 独立比较                                                                                   | 包与运行时检查                                                                     |
 | -------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
@@ -97,23 +97,35 @@ ctx.codexApplyPatch
 
 Oracle 由固定上游源码编译，候选输出不会充当自己的 oracle。精确命令、身份、哈希、失败记录和排除范围位于 [`conformance/*/STATUS.md`](conformance) 与 [`upstreams.lock.json`](upstreams.lock.json)。
 
-平台支持刻意保持窄范围：本项目目前只面向 macOS。上表是已经执行的 macOS arm64 源码证据；macOS x64 在运行独立 parity corpus 之前只作为构建/打包兼容通道。Linux 与 Windows 不在当前支持声明内。
+## 🌍 平台边界
 
-## 当前边界与路线图
+| 平台            | 当前处理                                                                                      |
+| --------------- | --------------------------------------------------------------------------------------------- |
+| macOS arm64     | `parity_verified`；当前源码与打包目标                                                         |
+| macOS x64       | `planned / unverified`；保留兼容性 CI，但不声明 parity                                        |
+| Linux x64/arm64 | `planned / unverified`；保留上游源码、corpus 与非阻断 CI，不发布 binary                       |
+| Windows x64     | `planned / unverified`；保留上游 `cfg(windows)`、PowerShell corpus 与非阻断 CI，不发布 binary |
 
-`dsh-codex` 还不是完整 Codex 替代品。Canonical composition 仍需精确实现并串接：
+在 macOS 上运行 Windows/Linux 风格输入，不构成对应操作系统的证据。平台 parity 必须让固定上游 oracle 与 candidate 在同一个真实平台执行。项目保留上游平台分支和 conformance 入口，避免未来重新研究；但不会发布猜测性兼容代码或未经验证的 native binary。
 
-- model provider 与 freeform tool transport；
-- canonical shell 执行与 sandbox retry；
-- managed network 与 network approval；
-- instructions、sessions、compaction、memory 与 subagents；
-- hooks、events、TurnDiff、CLI 与 UI。
+精确策略见[平台支持与证据](docs/platform-support.md)。
+
+## 🗺️ 下一步 TODO
+
+下一阶段应按依赖顺序推进，而不是继续增加彼此断开的工具：
+
+1. **macOS sandbox 组件**：精确复现固定 Codex Seatbelt profile、permission projection、denial detection 与 retry 输入，并作为独立 service 验证。
+2. **Canonical shell 组件**：统一拥有 argv/cwd/env、execpolicy、rich approval、sandbox attempt、process launch 与结果顺序，避免 stock DSH 的双重审批。
+3. **Freeform tool transport**：扩展 DSH model/provider 路径，让 Codex custom tool 传递原始 freeform 输入，而不是近似成 JSON Schema function。
+4. **模型可见 `apply_patch` 组件**：组合 freeform transport、已验证 apply-patch engine、approval、macOS sandbox、hooks/events 与 TurnDiff。
+5. **Managed network 组件**：实现 proxy state、network approval、session grant、持久 amendment 与实时 policy refresh。
+6. **Canonical agent profile**：组合 instructions、model provider、tools、session/resume、compaction、memory、subagents、CLI 与 UI，形成首个端到端 `dsh-codex` profile。
 
 当前 apply-patch 包是精确语义/文件系统引擎，还不是模型可见的 `apply_patch` 工具。Execpolicy 也不会直接 gate stock DSH Bash：stock Bash 无法在不产生可观察差异的前提下消费 Codex `bypassSandbox`、rich approval、managed network 与 retry 语义。
 
 最终目标仍是通过 DSH 组件得到完整 Codex 行为。未完成的 composition 会被明确记录为未完成，不会用低保真实现替代。
 
-## 仓库内容
+## 📁 仓库内容
 
 ```text
 crates/                 原生语义引擎
@@ -127,7 +139,7 @@ upstreams.lock.json     机器可读的 Git/npm 身份
 
 临时 JSONL、Cargo target、包构建产物和 native binary 不会提交。小型 corpus 与只用于测试的上游 instrumentation 会保留，让贡献者能够复现 parity 声明。
 
-## 开发
+## 🛠️ 开发
 
 ```bash
 pnpm check
@@ -139,18 +151,18 @@ pnpm check
 - [Approval](packages/approval/README.md)
 - [Apply-patch 语义引擎](packages/apply-patch-engine/README.md)
 
-## 参与贡献
+## 🤝 参与贡献
 
 欢迎提交 Issue 和 Pull Request。新组件应拥有一个清晰子系统边界，可以独立安装，遵守 DSH 生命周期语义，固定上游身份，并在声明 parity 前提供可复现的 conformance 证据。
 
 建议先阅读[组件包契约](docs/component-package-contract.md)、[组件地图](docs/components.md)和 [DSH 生态兼容性研究](docs/ecosystem-compatibility.md)。
 
-## 上游与独立性
+## 🔗 上游与独立性
 
 本项目是独立社区项目，与 OpenAI 或 DeepSeek 不存在隶属、背书或赞助关系。
 
 OpenAI Codex 与 DeepSeek Harness 是彼此独立的上游项目。这里使用它们的名称，是为了标识研究和集成对象，并不表示官方身份。
 
-## 许可
+## 📄 许可
 
 Apache-2.0。参见 [LICENSE](LICENSE)、[NOTICE](NOTICE)、[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 与 [UPSTREAMS.md](UPSTREAMS.md)。

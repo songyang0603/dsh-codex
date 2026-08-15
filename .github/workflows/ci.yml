@@ -122,12 +122,30 @@ jobs:
 
   component:
     name: ${{ matrix.name }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
         include:
+          - name: Linux x64 (planned)
+            runner: ubuntu-24.04
+            experimental: true
+            lint: false
+            package: false
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
+          - name: Linux arm64 (planned)
+            runner: ubuntu-24.04-arm
+            experimental: true
+            lint: false
+            package: false
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: macOS arm64
             runner: macos-15
+            experimental: false
             lint: true
             package: true
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
@@ -135,11 +153,20 @@ jobs:
             apply_patch_engine: target/release/dsh-codex-apply-patch-engine
           - name: macOS x64
             runner: macos-15-intel
+            experimental: true
             lint: false
             package: false
             execpolicy_engine: target/release/dsh-codex-execpolicy-engine
             approval_engine: target/release/dsh-codex-approval-protocol-engine
             apply_patch_engine: target/release/dsh-codex-apply-patch-engine
+          - name: Windows x64 (planned)
+            runner: windows-2022
+            experimental: true
+            lint: false
+            package: false
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine.exe
+            approval_engine: target/release/dsh-codex-approval-protocol-engine.exe
+            apply_patch_engine: target/release/dsh-codex-apply-patch-engine.exe
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:

@@ -10,7 +10,7 @@ Each completed component reproduces a precisely defined boundary from OpenAI Cod
 
 This repository is under active development. Three foundational components are verified today; installing them does **not** yet produce the complete Codex agent.
 
-## Why dsh-codex?
+## 💡 Why dsh-codex?
 
 DeepSeek Harness is built around composable plugins. `dsh-codex` uses that architecture to turn Codex subsystems into reusable DSH services with explicit ownership, lifecycle, packaging, and conformance boundaries.
 
@@ -22,7 +22,7 @@ This makes it possible to:
 - compare every completed boundary against the pinned upstream implementation;
 - build toward a native DSH coding agent rather than a bridge to the Codex binary.
 
-## Components
+## 🧩 Components
 
 | Component                                                                   | What it provides                                                                                                        | Status                                         |
 | --------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
@@ -32,7 +32,7 @@ This makes it possible to:
 
 See [the component map](docs/components.md) for the full Codex decomposition and [the parity standard](docs/parity-standard.md) for what `parity_verified` means.
 
-## Quick start
+## 🚀 Quick start
 
 Requirements: Node.js 22.19+, pnpm 10.19, Rust 1.95.0, and DeepSeek Harness `0.1.0-rc.6`.
 
@@ -65,7 +65,7 @@ ctx.codexApplyPatch
 
 These releases are currently source-only. No npm release or GitHub native-binary release is claimed yet.
 
-## How it works
+## ⚙️ How it works
 
 ```text
 Pinned Codex source
@@ -87,7 +87,7 @@ Native sidecars are used where a TypeScript rewrite would risk semantic drift. T
 
 Every installable package has its own `dsh.bundle.patch`, profile row, compiled entry points, instructions, license notices, and exact peers. The repository root is a component workspace, not an installable all-in-one bundle.
 
-## What is verified today
+## ✅ What is verified today
 
 | Boundary                    | Independent comparison                                                                         | Package/runtime checks                                                                    |
 | --------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -97,23 +97,35 @@ Every installable package has its own `dsh.bundle.patch`, profile row, compiled 
 
 The oracles are built from the pinned upstream source; candidate output never serves as its own oracle. Exact commands, identities, hashes, failures, and exclusions live under [`conformance/*/STATUS.md`](conformance) and in [`upstreams.lock.json`](upstreams.lock.json).
 
-Platform support is deliberately narrow: this project currently targets macOS. The rows above describe executed macOS arm64 source evidence; macOS x64 remains a build/packaging compatibility lane until its own parity corpus is executed. Linux and Windows are outside the current support claim.
+## 🌍 Platform scope
 
-## Current limits and roadmap
+| Platform        | Current treatment                                                                                                            |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| macOS arm64     | `parity_verified`; current source and packaging target                                                                       |
+| macOS x64       | `planned / unverified`; compatibility CI retained, but no parity claim                                                       |
+| Linux x64/arm64 | `planned / unverified`; upstream code, corpus, and non-blocking CI retained; no binary release                               |
+| Windows x64     | `planned / unverified`; upstream `cfg(windows)` behavior, PowerShell corpus, and non-blocking CI retained; no binary release |
 
-`dsh-codex` is not yet a complete Codex replacement. The canonical composition still needs exact implementations and end-to-end wiring for areas including:
+A Windows- or Linux-shaped case executed on macOS does not count as evidence for that operating system. A platform claim requires the pinned upstream oracle and candidate to run on the same real platform. We retain upstream platform branches and conformance entry points to avoid future reimplementation, but do not ship guessed compatibility code or unverified native binaries.
 
-- model-provider and freeform tool transport;
-- canonical shell execution and sandbox retry;
-- managed networking and network approval;
-- instructions, sessions, compaction, memory, and subagents;
-- hooks, events, TurnDiff, CLI, and UI.
+See [platform support and evidence](docs/platform-support.md) for the exact policy.
+
+## 🗺️ Next TODO
+
+The next work should follow dependency order rather than adding disconnected tools:
+
+1. **macOS sandbox component** — reproduce pinned Codex Seatbelt profiles, permission projection, denial detection, and retry inputs as an independently verified service.
+2. **Canonical shell component** — own argv/cwd/env normalization, execpolicy evaluation, rich approval, sandbox attempts, process launch, and exact result ordering without stock-DSH double prompts.
+3. **Freeform tool transport** — extend the DSH model/provider path so Codex custom tools can carry raw freeform input instead of being approximated as JSON Schema functions.
+4. **Model-visible `apply_patch` component** — compose freeform transport, the verified apply-patch engine, approval, macOS sandboxing, hooks/events, and TurnDiff.
+5. **Managed network component** — implement proxy state, network approval, session grants, persistent amendments, and live-policy refresh.
+6. **Canonical agent profile** — assemble instructions, model provider, tools, session/resume, compaction, memory, subagents, CLI, and UI into the first end-to-end `dsh-codex` profile.
 
 The current apply-patch package is the exact semantic/filesystem engine, not yet a model-visible `apply_patch` tool. Likewise, execpolicy intentionally does not gate stock DSH Bash: stock Bash cannot consume Codex `bypassSandbox`, rich approval, managed-network, and retry semantics without observable differences.
 
 The target remains full Codex behavior through DSH components. Unfinished composition is documented as unfinished rather than replaced with a lower-fidelity shortcut.
 
-## Repository contents
+## 📁 Repository contents
 
 ```text
 crates/                 native semantic engines
@@ -127,7 +139,7 @@ upstreams.lock.json     machine-readable Git and npm identities
 
 Generated JSONL outputs, Cargo targets, package builds, and native binaries are not committed. Compact corpora and test-only upstream instrumentation remain in the repository so contributors can reproduce a parity claim.
 
-## Development
+## 🛠️ Development
 
 ```bash
 pnpm check
@@ -139,18 +151,18 @@ Heavyweight conformance workflows are separate because they compile pinned upstr
 - [Approval](packages/approval/README.md)
 - [Apply-patch semantic engine](packages/apply-patch-engine/README.md)
 
-## Contributing
+## 🤝 Contributing
 
 Issues and pull requests are welcome. A new component should own one clear subsystem, install independently, preserve DSH lifecycle semantics, pin its upstream identity, and include reproducible conformance evidence before claiming parity.
 
 Start with [the component package contract](docs/component-package-contract.md), [the component map](docs/components.md), and [the DSH ecosystem compatibility study](docs/ecosystem-compatibility.md).
 
-## Upstream and independence
+## 🔗 Upstream and independence
 
 This is an independent community project. It is not affiliated with, endorsed by, or sponsored by OpenAI or DeepSeek.
 
 OpenAI Codex and DeepSeek Harness remain separate upstream projects. Their names identify the systems being studied and integrated; they do not imply official status.
 
-## License
+## 📄 License
 
 Apache-2.0. See [LICENSE](LICENSE), [NOTICE](NOTICE), [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), and [UPSTREAMS.md](UPSTREAMS.md).
