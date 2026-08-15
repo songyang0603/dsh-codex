@@ -35,12 +35,12 @@ jobs:
         shell: bash
     steps:
       - name: Check out dsh-codex
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Check out pinned Codex sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: openai/codex
           ref: 086396f7f60347b74c82784d5dfaf4fb2d3bda12
@@ -190,12 +190,12 @@ jobs:
         shell: bash
     steps:
       - name: Check out dsh-codex
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           persist-credentials: false
 
       - name: Check out pinned Codex sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: openai/codex
           ref: 086396f7f60347b74c82784d5dfaf4fb2d3bda12
