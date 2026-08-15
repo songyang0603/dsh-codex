@@ -97,20 +97,34 @@ function verifyUpstream(label, upstream, checkout) {
 verifyUpstream("codex", codex, codexCheckout);
 verifyUpstream("deepseekHarness", deepseekHarness, deepseekHarnessCheckout);
 
-const cargoManifest = readFileSync(
-  resolve(repositoryRoot, "crates/execpolicy-engine/Cargo.toml"),
-  "utf8",
+const cargoManifests = new Map(
+  ["execpolicy-engine", "approval-protocol-engine"].map((crate) => [
+    crate,
+    readFileSync(resolve(repositoryRoot, `crates/${crate}/Cargo.toml`), "utf8"),
+  ]),
 );
 const cargoLock = readFileSync(resolve(repositoryRoot, "Cargo.lock"), "utf8");
-for (const dependency of [
-  "codex-config",
-  "codex-exec-server",
-  "codex-execpolicy",
-  "codex-shell-command",
-  "codex-utils-absolute-path",
-  "codex-utils-cli",
-  "codex-utils-home-dir",
-]) {
+const directGitDependencies = [
+  ...[
+    "codex-config",
+    "codex-exec-server",
+    "codex-execpolicy",
+    "codex-shell-command",
+    "codex-utils-absolute-path",
+    "codex-utils-cli",
+    "codex-utils-home-dir",
+  ].map((dependency) => ({ crate: "execpolicy-engine", dependency })),
+  {
+    crate: "approval-protocol-engine",
+    dependency: "codex-app-server-protocol",
+  },
+];
+for (const { crate, dependency } of directGitDependencies) {
+  const cargoManifest = cargoManifests.get(crate);
+  if (cargoManifest === undefined) {
+    failures.push(`${crate}: Cargo manifest is unavailable`);
+    continue;
+  }
   const expression = new RegExp(
     `^${dependency.replaceAll("-", "\\-")}\\s*=\\s*\\{[^}]*\\brev\\s*=\\s*"([0-9a-f]{40})"[^}]*\\}`,
     "m",
@@ -118,7 +132,7 @@ for (const dependency of [
   const revision = cargoManifest.match(expression)?.[1];
   if (revision !== codex.commit) {
     failures.push(
-      `${dependency}: Cargo revision ${revision ?? "<missing>"} does not match ${codex.commit}`,
+      `${crate}/${dependency}: Cargo revision ${revision ?? "<missing>"} does not match ${codex.commit}`,
     );
   }
 
@@ -139,7 +153,7 @@ for (const dependency of [
     `#${codex.commit}"`;
   if (!packageRecord.includes(expectedSource)) {
     failures.push(
-      `${dependency}: Cargo.lock does not resolve the exact pinned Git commit`,
+      `${crate}/${dependency}: Cargo.lock does not resolve the exact pinned Git commit`,
     );
   }
 }
@@ -222,6 +236,15 @@ const packageManifests = [
     JSON.parse(
       readFileSync(
         resolve(repositoryRoot, "packages/execpolicy/package.json"),
+        "utf8",
+      ),
+    ),
+  ],
+  [
+    "approval",
+    JSON.parse(
+      readFileSync(
+        resolve(repositoryRoot, "packages/approval/package.json"),
         "utf8",
       ),
     ),

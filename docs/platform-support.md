@@ -25,6 +25,23 @@ establish that row. Linux sandbox behavior is outside the execpolicy boundary,
 but Linux path/config behavior and native process packaging still require their
 own run.
 
+## Approval source component
+
+| Platform           | Evidence host       | Current evidence                                                                                                                                                                              |
+| ------------------ | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| macOS arm64        | local Apple silicon | `0.1.0` source component `parity_verified`; upstream/source-pinned 43/43, adapter 10/10, 49 package tests, clean archived-package activation and stale superseded-token rejection in DSH rc.6 |
+| macOS arm64 remote | `macos-15`          | CI configured; no completed run recorded                                                                                                                                                      |
+| macOS x64          | `macos-15-intel`    | CI configured; no completed run recorded                                                                                                                                                      |
+| Linux x64          | `ubuntu-24.04`      | CI configured; no completed run recorded                                                                                                                                                      |
+| Linux arm64        | `ubuntu-24.04-arm`  | CI configured; no completed run recorded                                                                                                                                                      |
+| Windows x64        | `windows-2022`      | CI configured; no completed run recorded; `usize` width and native archive behavior require their own execution                                                                               |
+
+The verified boundary owns the pinned rich request/response wire, pending
+correlation and cancellation, generic live-session approval cache, and
+execpolicy-amendment persistence-before-release. Rich UI, shell/sandbox/network
+effects, complete app-server turn transport, and other operating systems remain
+separate claims.
+
 ## Distribution evidence
 
 Source builds are currently authoritative. `pnpm native:stage` performs a real

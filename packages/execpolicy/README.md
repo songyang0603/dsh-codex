@@ -41,7 +41,7 @@ pnpm --filter @songyang0603/dsh-codex-execpolicy build
 Then add the package's DSH bundle to a profile:
 
 ```sh
-dsh plugin --profile codex-dev add @deepseek-ai/cordis@4.0.1 ./packages/execpolicy
+dsh plugin --profile codex-dev add ./packages/execpolicy
 dsh --profile codex-dev --dump-config
 ```
 
@@ -51,12 +51,12 @@ online cloud bootstrap. Service activation performs the same pinned ordering
 as Codex: discover config, attempt the one-shot migration when applicable, then
 load policy and retain ownership of the canonical update path.
 
-The Cordis peer is installed explicitly so the package and DSH use the same
-Context instance. Package archives normalize the native file's Unix mode; the
-client restores only the owner execute bit on its own package-local sidecar
-before spawning it. The clean-profile smoke test checks the installed archive,
-native checksum, exact dependency versions, activation, and teardown without
-access to repository `target/*` fallbacks.
+The exact Cordis peer resolves through the DSH profile's dependency fallback so
+the package and DSH use the same Context instance. Package archives normalize
+the native file's Unix mode; the client restores only the owner execute bit on
+its own package-local sidecar before spawning it. The clean-profile smoke test
+checks the installed archive, native checksum, exact dependency versions,
+activation, and teardown without access to repository `target/*` fallbacks.
 
 ## Cordis API
 

@@ -44,6 +44,18 @@ jobs:
             codex-rs/shell-command
             codex-rs/core/src/exec_policy.rs
             codex-rs/core/src/exec_policy
+            codex-rs/core/src/session/handlers.rs
+            codex-rs/core/src/session/mod.rs
+            codex-rs/core/src/session/session.rs
+            codex-rs/core/src/session/tests.rs
+            codex-rs/core/src/tools/approvals.rs
+            codex-rs/core/src/tools/network_approval.rs
+            codex-rs/core/src/tools/sandboxing.rs
+            codex-rs/protocol/src/approvals.rs
+            codex-rs/protocol/src/protocol.rs
+            codex-rs/app-server-protocol/src/protocol/v2/item.rs
+            codex-rs/app-server-protocol/src/protocol/v2/permissions.rs
+            codex-rs/app-server/src/bespoke_event_handling.rs
             codex-rs/utils/cli
             codex-rs/utils/home-dir
 
@@ -62,6 +74,7 @@ jobs:
             vendor/loader
             vendor/schemastery
             packages/boot/app-boot
+            packages/interaction/user-approval
 
       - name: Verify source objects and dependency revisions
         run: >-
@@ -89,6 +102,11 @@ jobs:
           git -C .upstream/codex apply --check
           "$GITHUB_WORKSPACE/conformance/host-config/instrumentation.patch"
 
+      - name: Verify approval oracle instrumentation still applies
+        run: >-
+          git -C .upstream/codex apply --check
+          "$GITHUB_WORKSPACE/conformance/approval/instrumentation.patch"
+
   component:
     name: ${{ matrix.name }}
     strategy:
@@ -99,27 +117,32 @@ jobs:
             runner: ubuntu-24.04
             lint: true
             package: true
-            engine: target/release/dsh-codex-execpolicy-engine
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
           - name: Linux arm64
             runner: ubuntu-24.04-arm
             lint: false
             package: false
-            engine: target/release/dsh-codex-execpolicy-engine
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
           - name: macOS arm64
             runner: macos-15
             lint: false
             package: false
-            engine: target/release/dsh-codex-execpolicy-engine
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
           - name: macOS x64
             runner: macos-15-intel
             lint: false
             package: false
-            engine: target/release/dsh-codex-execpolicy-engine
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine
+            approval_engine: target/release/dsh-codex-approval-protocol-engine
           - name: Windows x64
             runner: windows-2022
             lint: false
             package: false
-            engine: target/release/dsh-codex-execpolicy-engine.exe
+            execpolicy_engine: target/release/dsh-codex-execpolicy-engine.exe
+            approval_engine: target/release/dsh-codex-approval-protocol-engine.exe
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 60
     steps:
@@ -152,6 +175,9 @@ jobs:
       - name: Install JavaScript dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify installed DSH artifact contracts
+        run: pnpm artifact:verify
+
       - name: Check Rust formatting
         if: matrix.lint
         run: cargo fmt --all -- --check
@@ -166,12 +192,13 @@ jobs:
         run: cargo build --locked --workspace
 
       - name: Build release sidecar for the installable source package
-        run: >-
-          cargo build --locked --release
-          --package dsh-codex-execpolicy-engine
+        run: cargo build --locked --release --workspace
 
-      - name: Verify and stage the native sidecar
-        run: node scripts/stage-execpolicy-native.mjs --binary ${{ matrix.engine }}
+      - name: Verify and stage the execpolicy native sidecar
+        run: node scripts/stage-execpolicy-native.mjs --binary ${{ matrix.execpolicy_engine }}
+
+      - name: Verify and stage the approval native sidecar
+        run: node scripts/stage-approval-native.mjs --binary ${{ matrix.approval_engine }}
 
       - name: Check TypeScript types
         run: pnpm typecheck

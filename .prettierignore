@@ -6,3 +6,4 @@ pnpm-lock.yaml
 
 # These are cryptographic conformance evidence, not formatter-owned sources.
 conformance/upstream-runtime/*.jsonl
+research/ecosystem-plugin-study/list-a/generated/

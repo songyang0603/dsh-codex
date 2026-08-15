@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/approval/output.schema.json",
+  "title": "Approval differential JSONL record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "evidence", "identity", "result"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "evidence": {
+      "enum": ["pinned_upstream", "pinned_private_source_model", "candidate"]
+    },
+    "identity": { "type": "object" },
+    "result": { "type": "object" }
+  }
+}

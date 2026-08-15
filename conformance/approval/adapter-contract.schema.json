@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/approval/adapter-contract.schema.json",
+  "title": "DSH approval adapter-owned contract corpus",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "operation", "expected"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "operation": {
+      "enum": [
+        "pendingReverseCorrelation",
+        "signalCancelLateDecision",
+        "unknownAndDuplicateResponse",
+        "malformedKnownResponse",
+        "ordinaryDoesNotOfferSessionChoice",
+        "disposeCancelsPending",
+        "crossThreadEqualIdIsolation",
+        "sameThreadEqualIdSupersedes",
+        "ambiguousDecisionFailsClosed",
+        "malformedBackendFailsClosed"
+      ]
+    },
+    "expected": { "type": "object" }
+  }
+}

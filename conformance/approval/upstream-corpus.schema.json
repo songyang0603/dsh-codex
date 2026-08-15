@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/songyang0603/dsh-codex/conformance/approval/upstream-corpus.schema.json",
+  "title": "Pinned Codex approval differential corpus",
+  "type": "object",
+  "required": ["schemaVersion", "id", "operation"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "operation": {
+      "enum": [
+        "decisions",
+        "requestWire",
+        "responseWire",
+        "cache",
+        "persistence",
+        "decisionFromCore",
+        "responseToCore"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "operation": { "const": "decisions" },
+        "input": { "$ref": "#/$defs/decisionInput" }
+      },
+      "required": ["input"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "requestWire" },
+        "params": { "type": "object" },
+        "comparison": { "enum": ["canonical", "acceptanceOnly"] },
+        "requiresPointerWidth": { "enum": [32, 64] }
+      },
+      "required": ["params"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "responseWire" },
+        "offered": { "type": "array", "items": { "$ref": "#/$defs/decision" } },
+        "response": { "type": "object" }
+      },
+      "required": ["offered", "response"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "cache" },
+        "sessions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["steps"],
+            "properties": {
+              "steps": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["keys", "fetchDecision"],
+                  "properties": {
+                    "keys": {
+                      "type": "array",
+                      "items": { "type": "string", "minLength": 1 }
+                    },
+                    "fetchDecision": { "$ref": "#/$defs/decision" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["sessions"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "persistence" },
+        "mode": { "enum": ["success", "failure"] },
+        "amendment": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["mode", "amendment"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "decisionFromCore" },
+        "reviewDecision": { "$ref": "#/$defs/coreReviewDecision" }
+      },
+      "required": ["reviewDecision"]
+    },
+    {
+      "properties": {
+        "operation": { "const": "responseToCore" },
+        "response": { "type": "object" }
+      },
+      "required": ["response"]
+    }
+  ],
+  "$defs": {
+    "decision": {
+      "oneOf": [
+        { "enum": ["accept", "acceptForSession", "decline", "cancel"] },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acceptWithExecpolicyAmendment"],
+          "properties": {
+            "acceptWithExecpolicyAmendment": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["execpolicy_amendment"],
+              "properties": {
+                "execpolicy_amendment": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["applyNetworkPolicyAmendment"],
+          "properties": {
+            "applyNetworkPolicyAmendment": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["network_policy_amendment"],
+              "properties": {
+                "network_policy_amendment": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["host", "action"],
+                  "properties": {
+                    "host": { "type": "string" },
+                    "action": { "enum": ["allow", "deny"] }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "decisionInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "explicitAvailableDecisions": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/decision" }
+        },
+        "networkApprovalContext": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["host", "protocol"],
+          "properties": {
+            "host": { "type": "string" },
+            "protocol": { "enum": ["http", "https", "socks5Tcp", "socks5Udp"] }
+          }
+        },
+        "proposedExecpolicyAmendment": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "proposedNetworkPolicyAmendments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["host", "action"],
+            "properties": {
+              "host": { "type": "string" },
+              "action": { "enum": ["allow", "deny"] }
+            }
+          }
+        },
+        "additionalPermissions": { "type": "object" }
+      }
+    },
+    "coreReviewDecision": {
+      "oneOf": [
+        {
+          "enum": [
+            "approved",
+            "approved_for_session",
+            "approved_mcp_policy_amendment",
+            "timed_out",
+            "abort"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approved_execpolicy_amendment"],
+          "properties": {
+            "approved_execpolicy_amendment": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["proposed_execpolicy_amendment"],
+              "properties": {
+                "proposed_execpolicy_amendment": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["network_policy_amendment"],
+          "properties": {
+            "network_policy_amendment": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["network_policy_amendment"],
+              "properties": {
+                "network_policy_amendment": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["host", "action"],
+                  "properties": {
+                    "host": { "type": "string" },
+                    "action": { "enum": ["allow", "deny"] }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["denied"],
+          "properties": {
+            "denied": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["rejection"],
+              "properties": { "rejection": { "type": "string" } }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -15,3 +15,4 @@ target/
 .artifacts/
 .upstream-worktrees/
 packages/execpolicy/native/
+packages/approval/native/

@@ -40,3 +40,13 @@
   when changing pins, native semantics, or DSH integration.
 - Do not describe a configured CI matrix as passing until the corresponding
   remote workflow has actually completed.
+
+## Decision records
+
+- Current architecture and component status live under `docs/`; public package
+  contracts live beside each package.
+- Decisions that change behavior, package ownership, wire/durable formats,
+  test strategy, release process, or reusable rationale need one lifecycle
+  note under `.agents/notes/`; follow `.agents/notes/README.md`.
+- A proposed note becomes implemented only after source, tests, assembled DSH
+  profile behavior, and current-state documentation converge.

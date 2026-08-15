@@ -51,6 +51,76 @@
           "path": "codex-rs/core/src/exec_policy",
           "gitObjectType": "tree",
           "gitObject": "b313a3ba1b113f08e3c1686272162910dad76540"
+        },
+        "approvalProtocol": {
+          "path": "codex-rs/protocol/src/approvals.rs",
+          "gitObjectType": "blob",
+          "gitObject": "44dc8d7d7c9728a69e0b153dc1e43e248aaab9bc"
+        },
+        "approvalReviewDecision": {
+          "path": "codex-rs/protocol/src/protocol.rs",
+          "gitObjectType": "blob",
+          "gitObject": "bd5579987b3413eb4144da68a67d55a27677a1ca"
+        },
+        "approvalAppServerV2Item": {
+          "path": "codex-rs/app-server-protocol/src/protocol/v2/item.rs",
+          "gitObjectType": "blob",
+          "gitObject": "dcfe928508e8eef1af3b3f05c739860e75c0d607"
+        },
+        "appServerProtocol": {
+          "path": "codex-rs/app-server-protocol",
+          "gitObjectType": "tree",
+          "gitObject": "1120727af584eecf578cdd6a5c63d3a9146167c8"
+        },
+        "appServerProtocolV2": {
+          "path": "codex-rs/app-server-protocol/src/protocol/v2",
+          "gitObjectType": "tree",
+          "gitObject": "079e6cf5d2adbe98f3d3fd6fa3fbc2acb9b0b252"
+        },
+        "approvalAppServerV2Permissions": {
+          "path": "codex-rs/app-server-protocol/src/protocol/v2/permissions.rs",
+          "gitObjectType": "blob",
+          "gitObject": "9360934aa4c92e907a905926b490463cdd66a163"
+        },
+        "approvalStore": {
+          "path": "codex-rs/core/src/tools/sandboxing.rs",
+          "gitObjectType": "blob",
+          "gitObject": "2d20334f6446b2273128e6ed54e8001e28e37a76"
+        },
+        "approvalSessionHandlers": {
+          "path": "codex-rs/core/src/session/handlers.rs",
+          "gitObjectType": "blob",
+          "gitObject": "a928090cc82eae3368030172e36b938c9422d5c3"
+        },
+        "approvalSessionConstructor": {
+          "path": "codex-rs/core/src/session/session.rs",
+          "gitObjectType": "blob",
+          "gitObject": "84829d90f112ab4717abeaa16877379c3ca0a117"
+        },
+        "approvalSessionTests": {
+          "path": "codex-rs/core/src/session/tests.rs",
+          "gitObjectType": "blob",
+          "gitObject": "a56c9bbdde0fa18c3394558692545a9a4749e3f3"
+        },
+        "approvalToolKeys": {
+          "path": "codex-rs/core/src/tools/approvals.rs",
+          "gitObjectType": "blob",
+          "gitObject": "4f5512482bde71761393f7e60ae60d1962d90a94"
+        },
+        "approvalSessionState": {
+          "path": "codex-rs/core/src/session/mod.rs",
+          "gitObjectType": "blob",
+          "gitObject": "fb12a66355ae216cac6322fa08401fced59f5b70"
+        },
+        "approvalNetworkState": {
+          "path": "codex-rs/core/src/tools/network_approval.rs",
+          "gitObjectType": "blob",
+          "gitObject": "c41f8635922039a786cb33000e03fbfc41bc0762"
+        },
+        "approvalAppServerBridge": {
+          "path": "codex-rs/app-server/src/bespoke_event_handling.rs",
+          "gitObjectType": "blob",
+          "gitObject": "32c222668614aa17b8496712c24b061d76bcc2b5"
         }
       }
     },
@@ -83,6 +153,12 @@
         "@deepseek-ai/schemastery": {
           "version": "3.18.1",
           "integrity": "sha512-Qn0FCSwCQnpnj6SB31I6i2sIKgKWnkbJM8O0EU91Gv2UsYVvtZTl6IA0sCwk2e2MZf5S8w5hpq9QkeVvK9qwxg=="
+        },
+        "@deepseek-ai/dsh-user-approval": {
+          "version": "0.1.0-rc.6",
+          "integrity": "sha512-9rnkSDGOpu2XUeGwbPeTzVUTFWTND1PMPM5L/ZQPptV5yyZlQiNxM2rCC6OdL+ZVerwxEqrRhZIQn/KVtQfKag==",
+          "direct": false,
+          "gitHead": null
         }
       },
       "components": {
@@ -121,6 +197,12 @@
           "gitObjectType": "tree",
           "gitObject": "8d8a71d82ac87348969ffeffe1bab0d454631bb0",
           "packageVersion": "1.0.6"
+        },
+        "userApproval": {
+          "path": "packages/interaction/user-approval",
+          "gitObjectType": "tree",
+          "gitObject": "2fef8ef72b09ae6a2abbd0a1bd0ce82e1fb5cb80",
+          "packageVersion": "0.1.0-rc.5"
         }
       }
     }

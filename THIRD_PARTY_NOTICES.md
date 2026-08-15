@@ -8,8 +8,10 @@ Apache License, Version 2.0. See `UPSTREAMS.md` and `upstreams.lock.json` for
 the exact source boundaries and object identities.
 
 The current copied/adapted behavior concerns execpolicy runtime, configuration,
-and persistence. Modified Rust source carries prominent change notices. Direct
-Git dependencies remain upstream code.
+and persistence. The approval protocol sidecar directly links the pinned
+public Codex app-server protocol crate; its DSH lifecycle/state adapter is
+independently written. Modified Rust source carries prominent change notices.
+Direct Git dependencies remain upstream code.
 
 Upstream Codex carries additional notices, including MIT-licensed
 Ratatui-derived code. This repository does not currently copy that UI code. If
@@ -22,9 +24,10 @@ The TypeScript packages use public DeepSeek Harness and Cordis plugin APIs.
 DeepSeek Harness is licensed under the MIT License. No DeepSeek Harness source
 is vendored into this repository.
 
-The audited rc.5 source snapshot and the exact installed npm artifacts,
-including the rc.6 CLI used only by integration tests, are recorded separately.
-No source-to-tarball identity is inferred.
+The audited rc.5 source snapshot and the exact installed npm artifacts are
+recorded separately. The rc.6 CLI is used by integration tests, and the rc.6
+one-shot approval declaration is used only as a reduced compatibility-contract
+fixture. No source-to-tarball identity is inferred for either artifact.
 
 ## Release inventories
 

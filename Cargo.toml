@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/execpolicy-engine"]
+members = ["crates/approval-protocol-engine", "crates/execpolicy-engine"]
 resolver = "2"
 
 [workspace.package]

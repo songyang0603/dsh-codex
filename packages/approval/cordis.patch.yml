@@ -1,0 +1,6 @@
+# Install the exact approval protocol and live-session state service. Rich UI,
+# shell execution, sandboxing, and network-policy effects are separate
+# dsh-codex components.
+- insert:
+    - id: dsh-codex-approval
+      name: "@songyang0603/dsh-codex-approval"

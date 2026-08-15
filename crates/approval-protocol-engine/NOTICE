@@ -1,0 +1,17 @@
+dsh-codex approval protocol engine
+Copyright 2026 Songyang Gao and dsh-codex contributors
+
+OpenAI Codex
+Copyright 2025 OpenAI
+
+THIS BINARY DIRECTLY LINKS THE PINNED `codex-app-server-protocol` CRATE FROM
+OPENAI CODEX COMMIT 086396f7f60347b74c82784d5dfaf4fb2d3bda12. OPENAI CODEX
+IS LICENSED UNDER THE APACHE LICENSE, VERSION 2.0.
+
+The upstream Rust types and their serde implementations are used directly as
+the production command-approval wire parser and serializer. They are not
+reimplemented in TypeScript. This independent project is not affiliated with,
+endorsed by, or sponsored by OpenAI.
+
+The Apache License, Version 2.0, and repository-wide notices are distributed at
+the workspace root as LICENSE and NOTICE.

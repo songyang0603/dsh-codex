@@ -9,6 +9,14 @@
     "url": "git+https://github.com/songyang0603/dsh-codex.git",
     "directory": "packages/execpolicy"
   },
+  "homepage": "https://github.com/songyang0603/dsh-codex/tree/main/packages/execpolicy#readme",
+  "keywords": [
+    "deepseek-harness",
+    "dsh-plugin",
+    "codex",
+    "execpolicy",
+    "command-policy"
+  ],
   "publishConfig": {
     "access": "public"
   },

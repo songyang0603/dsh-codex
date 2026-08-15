@@ -1,0 +1,19 @@
+[package]
+name = "dsh-codex-approval-protocol-engine"
+description = "Lossless pinned Codex command-approval protocol sidecar for DeepSeek Harness"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+publish = false
+
+[dependencies]
+# This direct dependency is the production serde implementation. Keep the full
+# Git revision: floating or reimplementing the wire in TypeScript is forbidden.
+codex-app-server-protocol = { git = "https://github.com/openai/codex", rev = "086396f7f60347b74c82784d5dfaf4fb2d3bda12" }
+serde.workspace = true
+serde_json.workspace = true
+
+[lints.rust]
+unsafe_code = "forbid"

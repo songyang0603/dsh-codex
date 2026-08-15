@@ -1,0 +1,18 @@
+dsh-codex approval package
+Copyright 2026 Songyang Gao and dsh-codex contributors
+
+OpenAI Codex
+Copyright 2025 OpenAI
+
+This product directly links the OpenAI Codex app-server protocol crate and
+contains an independently written TypeScript adapter for approval
+state-machine behavior, pinned at commit
+086396f7f60347b74c82784d5dfaf4fb2d3bda12. OpenAI Codex is licensed under the
+Apache License, Version 2.0. Exact source files and Git object ids are listed
+in UPSTREAMS.md.
+
+This product interoperates with DeepSeek Harness and Cordis, distributed under
+the MIT License. No DeepSeek Harness source is vendored in this package.
+
+This project is independent and is not affiliated with, endorsed by, or
+sponsored by OpenAI or DeepSeek.

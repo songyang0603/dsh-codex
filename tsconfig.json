@@ -1,4 +1,7 @@
 {
   "files": [],
-  "references": [{ "path": "./packages/execpolicy" }]
+  "references": [
+    { "path": "./packages/execpolicy" },
+    { "path": "./packages/approval" }
+  ]
 }

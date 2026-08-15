@@ -15,7 +15,7 @@ component boundary, but behavior inside that boundary may not be weakened.
 | Package                              | Responsibility                                                                                                           | Status                                           |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
 | `@songyang0603/dsh-codex-execpolicy` | policy/config loading, command classification, approval-requirement derivation, canonical migration and rule persistence | `0.1.0`; `parity_verified` on macOS arm64 source |
-| `@songyang0603/dsh-codex-approval`   | rich approval wire, pending correlation and live-session cache                                                           | planned; not in the first release                |
+| `@songyang0603/dsh-codex-approval`   | lossless rich approval wire, pending correlation and live-session cache                                                  | `0.1.0`; `parity_verified` on macOS arm64 source |
 
 `execpolicy` deliberately does not export a generic DSH `bash` enforcement
 adapter. Stock DSH Bash cannot apply Codex `bypassSandbox`, managed-network,
@@ -23,8 +23,50 @@ rich-approval, and retry semantics without changing the observable behavior.
 Those responsibilities belong to exact approval, shell, sandbox, and network
 components. This is component separation, not a reduced Codex target.
 
-See [docs/components.md](docs/components.md) for the full decomposition and
+See [docs/components.md](docs/components.md) for the full decomposition,
+[docs/component-package-contract.md](docs/component-package-contract.md) for
+the package/state ownership rules, and
 [docs/parity-standard.md](docs/parity-standard.md) for the completion rule.
+
+## DSH ecosystem contract
+
+This is a component monorepo, not one opaque plugin. Every independently
+installable package ships its own `dsh.bundle.patch`, unique profile row,
+compiled entry points, package-scoped instructions, and exact DSH peers. Test
+and conformance sources stay in GitHub for contributors, while package archives
+exclude them.
+
+The repository root is not advertised as an installable bundle. Until a
+versioned canonical composition profile exists, do not use
+`github:songyang0603/dsh-codex` as though it installed every component. Source
+checkouts use explicit package paths; future registry releases will use one npm
+package per component and prebuilt platform artifacts where native code is
+required.
+
+These choices come from a pinned, per-plugin source study of both public
+awesome lists and the `dsh-plugin` topic catalog, plus official rc.6 behavior.
+See [docs/ecosystem-compatibility.md](docs/ecosystem-compatibility.md) for the
+coverage, implementation records, conflicts between community installers, and
+the rules we adopted.
+
+## Approval evidence
+
+The approval `0.1.0` macOS arm64 source-component tuple is
+`parity_verified`. It matches all 43 independent upstream or source-pinned
+cases and all 10 DSH-owned adapter contracts. Its mandatory native protocol
+engine directly uses pinned Codex serde before JavaScript parses the subject,
+preserving exact `i64::MAX` and 64-bit `usize::MAX` while their overflowing
+neighbors remain rejected. It also passes 49 package tests and a clean DSH
+rc.6 archive add/activate/remove check that verifies and boots the package-local
+native binary, preserves lossless integers, and proves that a superseded
+prompt's late response cannot approve its replacement. No failed case was
+skipped or waived.
+
+This exact boundary covers the rich command-approval wire, pending
+correlation/cancellation, generic live-session approval cache, and execpolicy
+amendment persistence-before-release. It does not claim the future rich UI,
+canonical shell/sandbox/network consumer, complete app-server turn transport,
+or unexecuted Linux/Windows platforms.
 
 ## Execpolicy evidence
 
@@ -60,6 +102,7 @@ Requirements: Node.js 22.19+, pnpm 10.19, and Rust 1.95.0.
 pnpm install
 pnpm native:stage
 pnpm --filter @songyang0603/dsh-codex-execpolicy build
+pnpm --filter @songyang0603/dsh-codex-approval build
 ```
 
 `native:stage` builds the current-platform Rust sidecar, verifies its protocol
@@ -67,23 +110,27 @@ and every pinned source identity, then places it in the package-local native
 directory with a SHA-256 file. Generated binaries are intentionally ignored by
 Git.
 
-The execpolicy package declares a DSH bundle. With the DSH CLI installed:
+Each completed component package declares its own DSH bundle. With the DSH CLI
+installed:
 
 ```sh
-dsh plugin --profile codex-dev add @deepseek-ai/cordis@4.0.1 ./packages/execpolicy
+dsh plugin --profile codex-dev add ./packages/execpolicy
+dsh plugin --profile codex-approval-dev add ./packages/approval
 dsh --profile codex-dev --dump-config
 ```
 
-The exact Cordis peer keeps the plugin on the DSH Context instance. The bundle
-mounts `ctx.codexExecPolicy` and opens the canonical local Codex
+The exact Cordis peer resolves through the profile's own dependency fallback,
+keeping the plugin on the DSH Context instance. The bundle mounts
+`ctx.codexExecPolicy` and opens the canonical local Codex
 policy stack. It does not yet turn a stock DSH agent into Codex by itself; later
 components consume its exact semantic results.
 
-This first release is source-only. No npm package or GitHub native-binary
-release is claimed.
+These component releases are source-only. No npm package or GitHub
+native-binary release is claimed.
 
 For API examples and configuration modes, see
-[packages/execpolicy/README.md](packages/execpolicy/README.md).
+[packages/execpolicy/README.md](packages/execpolicy/README.md) and
+[packages/approval/README.md](packages/approval/README.md).
 
 ## Repository layout
 

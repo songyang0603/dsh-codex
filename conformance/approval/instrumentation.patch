@@ -1,0 +1,8 @@
+diff --git a/codex-rs/core/src/session/tests.rs b/codex-rs/core/src/session/tests.rs
+index a56c9bbdd..486bc9b3a 100644
+--- a/codex-rs/core/src/session/tests.rs
++++ b/codex-rs/core/src/session/tests.rs
+@@ -11555,0 +11556,3 @@
++
++#[path = "approval_conformance_oracle.rs"]
++mod dsh_codex_approval_conformance_oracle;
